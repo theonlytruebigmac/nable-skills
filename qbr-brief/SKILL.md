@@ -88,7 +88,7 @@ Validate all queries before executing.
 
 **Vulnerability Posture**
 - Unresolved detections: X (Critical: X, Important: X, Moderate: X, Low: X)
-- Resolved this quarter: X
+- Currently resolved: X
 
 **Environment Risks**
 - Devices on EOL OS: [list]

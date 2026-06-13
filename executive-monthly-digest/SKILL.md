@@ -11,9 +11,10 @@ Produce a leadership-ready monthly operations summary across all managed custome
 ### Fleet overview
 
 ```graphql
-query MonthlyDigestFleet {
-  assetSearch(first: 500) {
+query MonthlyDigestFleet($after: String) {
+  assetSearch(first: 500, after: $after) {
     totalCount
+    pageInfo { hasNextPage endCursor }
     nodes {
       id
       customer { id name }
@@ -38,20 +39,22 @@ query MonthlyDigestPatches {
 }
 ```
 
-### Vulnerability aggregations (all customers)
+### Critical-unresolved vulnerabilities (per customer)
+
+Run once per customer (use the `customer.id` values from the fleet query). Filtering on BOTH status and severity in one query gives a true critical-AND-unresolved count — do not derive it by summing independent severity and status buckets.
 
 ```graphql
-query MonthlyDigestVulns {
-  vulnerabilityDetectionAggregations {
-    status { buckets(size: 5) { key count } }
-    vulnerability {
-      severity { buckets(size: 5) { key count } }
-    }
+query MonthlyDigestCriticalVulns($customerId: ID!) {
+  vulnerabilityDetectionSearch(
+    inOrganization: $customerId
+    where: { status: { in: [UNRESOLVED] }, vulnerability: { severity: { in: [CRITICAL] } } }
+  ) {
+    totalCount
   }
 }
 ```
 
-Validate before executing. Paginate fleet query if `totalCount > 500`.
+Validate before executing. Paginate the fleet query when `totalCount > 500`: re-run with `after: <pageInfo.endCursor>` while `pageInfo.hasNextPage` is true, aggregating node-derived metrics across all pages.
 
 ## Metrics to compute from returned data
 
@@ -63,8 +66,8 @@ Validate before executing. Paginate fleet query if `totalCount > 500`.
 | Unmanaged devices | `isManaged = false` count |
 | Patch compliance | COMPLETED / (COMPLETED + AVAILABLE + ERROR) × 100 |
 | Patch errors | ERROR count from aggregations |
-| Open critical vulns | CRITICAL + UNRESOLVED from vuln aggregations |
-| Customers with critical vulns | Distinct `customer.id` with critical unresolveddetections |
+| Open critical vulns | Sum of `vulnerabilityDetectionSearch.totalCount` (critical + unresolved) across customers |
+| Customers with critical vulns | Count of customers whose `vulnerabilityDetectionSearch.totalCount > 0` |
 
 ## Output format
 

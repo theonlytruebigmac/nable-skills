@@ -63,7 +63,7 @@ query SLAPatchErrors($customerId: ID!) {
 }
 ```
 
-Validate before executing. Omit `$customerId` / `inOrganization` to run across all customers.
+Validate before executing. To run across all customers, omit `$customerId` and remove the `inOrganization` (Query 1) / `inOrganizations` (Query 2) argument.
 
 ## SLA breach thresholds (customize to your contracts)
 
@@ -72,8 +72,8 @@ Validate before executing. Omit `$customerId` / `inOrganization` to run across a
 | Critical CVE | 7 days from detection |
 | Important CVE | 30 days from detection |
 | Medium CVE | 90 days from detection |
-| Critical patch | 14 days from release |
-| Important patch | 30 days from release |
+| Critical patch | 14 days in ERROR state |
+| Important patch | 30 days in ERROR state |
 
 ## Analysis
 

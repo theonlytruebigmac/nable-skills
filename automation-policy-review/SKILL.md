@@ -44,6 +44,17 @@ query RecentTaskFailures($customerId: ID) {
       failureReason
       retryCount
       createdAt
+      context {
+        ... on Asset {
+          id
+          name
+          customer { id name }
+        }
+        ... on Organization {
+          id
+          name
+        }
+      }
       latestExecution {
         startedAt
         durationMilliseconds
@@ -63,7 +74,7 @@ Use the dedicated tool:
 - Required: `assetId`
 - Optional: `first` (default 25), `where: { task: { type: { equals: "TASK_SUBTYPE_RUN_SCRIPT" } } }`
 
-Returns: `id`, `status` (SUCCEEDED/FAILED/IN_PROGRESS), `errorMessage`, `exitCode`, `task.name`, `startedAt`, `durationMilliseconds`
+Returns: `id`, `status` (SUCCEEDED/FAILED/IN_PROGRESS), `errorMessage`, `exitCode`, `task.name`. For start time or duration at the device level, source it from the Section 2 `taskSearch` `latestExecution { startedAt durationMilliseconds }` selection instead.
 
 Validate GraphQL queries before executing.
 
@@ -80,7 +91,7 @@ Validate GraphQL queries before executing.
 
 Summary: total tasks reviewed, count succeeded / failed / in-progress.
 
-Then list failed tasks sorted by customer:
+Then list failed tasks sorted by customer (the Customer and Device labels come from each node's `context`: for device-level tasks it resolves to an `Asset` — use `context.name` as the Device and `context.customer.name` as the Customer):
 - Task name | Customer | Device | Status | Exit code | Error message | Started at
 
 Recommended actions:

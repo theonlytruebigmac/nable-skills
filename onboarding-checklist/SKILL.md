@@ -28,12 +28,14 @@ query FindCustomer($name: String!) {
 ## Pull all devices for the customer
 
 ```graphql
-query OnboardingAudit($customerId: ID!) {
+query OnboardingAudit($customerId: ID!, $after: String) {
   assetSearch(
     first: 200
+    after: $after
     inOrganizations: [$customerId]
   ) {
     totalCount
+    pageInfo { hasNextPage endCursor }
     nodes {
       id
       name
@@ -52,7 +54,7 @@ query OnboardingAudit($customerId: ID!) {
 }
 ```
 
-Validate before executing.
+Validate before executing. If `totalCount` exceeds the returned node count, page through the rest before computing the audit counts: re-run with `after: $endCursor` (re-validating each time) while `pageInfo.hasNextPage` is true, so all `totalCount` assets are covered. The onboarded/gap counts must reflect the full fleet, not just the first 200 devices.
 
 ## Baseline checks per device
 

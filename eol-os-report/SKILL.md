@@ -9,12 +9,14 @@ Identify devices running end-of-life operating systems using the N-able MCP.
 ## Query
 
 ```graphql
-query EOLOsReport {
+query EOLOsReport($after: String) {
   assetSearch(
     first: 500
+    after: $after
     orderBy: [{ field: NAME, direction: ASC }]
   ) {
     totalCount
+    pageInfo { endCursor hasNextPage }
     nodes {
       id
       name
@@ -30,7 +32,7 @@ query EOLOsReport {
 }
 ```
 
-Validate before executing. Paginate using `after` cursor if `totalCount > 500`.
+Validate before executing. If `totalCount > 500`, paginate: re-run with `after: <pageInfo.endCursor>` and loop while `pageInfo.hasNextPage` is true, accumulating all `nodes` so the totals and percentages cover the whole fleet.
 
 ## EOL reference (as of June 2026)
 
@@ -48,7 +50,7 @@ Validate before executing. Paginate using `after` cursor if `totalCount > 500`.
 
 ## Classification
 
-Parse `operatingSystemInfo.name` and `featureRelease` against the table above:
+Parse `operatingSystemInfo.name`, `version` (and `buildNumber`), and `featureRelease` against the table above. Use `version` to distinguish server releases (Server 2016/2019/2022) and Windows 10 vs 11, since `name` alone does not differentiate them and `featureRelease` only applies to Windows 10/11:
 
 | Category | Meaning |
 |---|---|

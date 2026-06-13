@@ -83,6 +83,6 @@ Per device:
 - Logical drives: drive letter, size, filesystem
 - Tags
 
-Group: OFFLINE and DEGRADED first, then HEALTHY.
+Group: OFFLINE, DEGRADED, and UNMANAGED first, then HEALTHY.
 
 End with: X healthy, X degraded, X offline, X unmanaged across N devices.

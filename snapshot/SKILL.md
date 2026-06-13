@@ -43,14 +43,18 @@ query SnapshotPatchAggs {
 
 ```graphql
 query SnapshotVulnAggs {
-  vulnerabilityDetectionAggregations {
+  status: vulnerabilityDetectionAggregations {
     status { buckets(size: 5) { key count } }
+  }
+  unresolved: vulnerabilityDetectionAggregations(where: { status: { in: [UNRESOLVED] } }) {
     vulnerability {
       severity { buckets(size: 5) { key count } }
     }
   }
 }
 ```
+
+The `status` alias returns the overall resolved/unresolved counts; the `unresolved` alias scopes the severity breakdown to unresolved detections so the "Vulnerability Severity (unresolved)" table is accurate.
 
 Validate each query before executing.
 

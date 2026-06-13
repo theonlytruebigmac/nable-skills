@@ -18,7 +18,7 @@ query RenewalRiskFleet {
     nodes {
       id
       name
-      customer { id name }
+      customer { id name parentOrganization { name } }
       agentConnection { status statusChangedAt }
       patchManagement { status }
       operatingSystemInfo { name }
@@ -30,20 +30,24 @@ query RenewalRiskFleet {
 }
 ```
 
-## Step 2 — Vulnerability counts per customer
+## Step 2 — Unresolved CRITICAL vulnerability count per customer
 
 ```graphql
-query RenewalRiskVulnsByCustomer($customerId: ID!) {
-  vulnerabilityDetectionAggregations(inOrganization: $customerId) {
-    vulnerability {
-      severity { buckets(size: 5) { key count } }
+query RenewalRiskCriticalVulns($customerId: ID!) {
+  vulnerabilityDetectionSearch(
+    inOrganization: $customerId
+    where: {
+      vulnerability: { severity: { in: [CRITICAL] } }
+      status: { in: [UNRESOLVED] }
     }
-    status { buckets(size: 5) { key count } }
+  ) {
+    totalCount
   }
 }
 ```
 
-Run this per customer found in Step 1. Group by `customer.id`.
+Run this per customer found in Step 1. `totalCount` is the number of detections
+that are both CRITICAL and UNRESOLVED — the count the scoring signal needs.
 
 ## Step 3 — Patch error counts per customer
 

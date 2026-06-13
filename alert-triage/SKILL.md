@@ -8,7 +8,7 @@ Pull and prioritize active issues across the N-central fleet using the N-able MC
 
 ## What's available
 
-The N-able GraphQL API does not have a dedicated "alert" type. Active issues surface through two signals:
+The N-able GraphQL API does not have a dedicated "alert" type. Active issues surface through four signals:
 1. **Disconnected agents** — assets where `agentConnection.status = DISCONNECTED`
 2. **Vulnerability detections** — via `vulnerabilityDetectionSearch` with `status: UNRESOLVED`
 3. **Patch failures** — via `patchInstallationSearch` with `status: ERROR`
@@ -34,6 +34,7 @@ query AlertTriageDisconnected($customer: ID) {
       operatingSystemInfo { name type }
       chassis { types }
       lastBootedAt
+      reboot { isRequired }
       tags { nodes { name } }
     }
   }
@@ -45,10 +46,11 @@ Remove `inOrganizations` arg if running across all customers (omit the variable)
 ### 2. Patch failures
 
 ```graphql
-query AlertTriagePatchErrors {
+query AlertTriagePatchErrors($customer: ID) {
   patchInstallationSearch(
     first: 50
     where: { installationStatus: { equals: ERROR } }
+    inOrganizations: [$customer]
   ) {
     totalCount
     nodes {
@@ -64,13 +66,16 @@ query AlertTriagePatchErrors {
 }
 ```
 
+Remove `inOrganizations` arg if running across all customers (omit the variable).
+
 ### 3. Critical unresolved vulnerabilities
 
 ```graphql
-query AlertTriageVulns {
+query AlertTriageVulns($customer: ID) {
   vulnerabilityDetectionSearch(
     first: 50
     where: { status: { in: [UNRESOLVED] } }
+    inOrganization: $customer
     orderBy: [{ field: RISK_SCORE, direction: DESC }]
   ) {
     totalCount
@@ -85,6 +90,8 @@ query AlertTriageVulns {
 }
 ```
 
+Remove `inOrganization` arg if running across all customers (omit the variable).
+
 Validate each query with `validate` before executing with `execute`.
 
 ## Output format
@@ -97,10 +104,10 @@ Validate each query with `validate` before executing with `execute`.
 **Patch Failures** (sorted by failure count desc)
 - Device | Customer | Patch | Failures | Last error
 
-**Critical Vulnerabilities** (CVSS ≥ 7.0 or hasExploit=true)
+**Critical Vulnerabilities** (severity HIGH/CRITICAL or hasExploit=true)
 - Device | Customer | CVE | Risk score | Patchable?
 
-**Reboot Required**
+**Reboot Required** (from the Step 1 disconnected-agents query)
 - List devices where `reboot.isRequired = true`
 
 End with a one-line count: X disconnected, X patch failures, X critical vulns.

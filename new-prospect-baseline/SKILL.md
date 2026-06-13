@@ -66,7 +66,7 @@ query ProspectPatchBaseline($customerId: ID!) {
 
 ```graphql
 query ProspectVulnBaseline($customerId: ID!) {
-  vulnerabilityDetectionAggregations(inOrganization: $customerId) {
+  vulnerabilityDetectionAggregations(inOrganization: $customerId, where: { status: { in: [UNRESOLVED] } }) {
     vulnerability {
       severity { buckets(size: 5) { key count } }
     }

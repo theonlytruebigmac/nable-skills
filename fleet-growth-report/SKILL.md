@@ -9,12 +9,14 @@ Analyze fleet composition across all customers using the N-able MCP.
 ## Query
 
 ```graphql
-query FleetGrowthReport {
+query FleetGrowthReport($after: String) {
   assetSearch(
     first: 500
+    after: $after
     orderBy: [{ field: NAME, direction: ASC }]
   ) {
     totalCount
+    pageInfo { hasNextPage endCursor }
     nodes {
       id
       name
@@ -45,7 +47,7 @@ query FleetAggregations {
 }
 ```
 
-Validate before executing. Paginate if `totalCount > 500`.
+Validate before executing. If `totalCount > 500`, paginate: pass `pageInfo.endCursor` as the `$after` argument and re-query while `pageInfo.hasNextPage` is true, aggregating nodes across all pages before computing the breakdowns below.
 
 ## Aggregations to compute
 
@@ -63,7 +65,7 @@ Note: The GraphQL schema is a current-state system. Month-over-month delta requi
 **Fleet Report — [Date]**
 
 **Estate Overview**
-- Total managed devices: X
+- Total managed devices: X (nodes where `isManaged = true`)
 - By OS: Windows X | Linux X | macOS X
 - Agent connectivity: X connected (X%) | X disconnected
 - Unmanaged devices: X across X customers

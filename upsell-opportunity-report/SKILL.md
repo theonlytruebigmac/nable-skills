@@ -20,7 +20,7 @@ query UpsellFleet {
       name
       customer { id name }
       serviceOrganization { name }
-      operatingSystemInfo { name type featureRelease }
+      operatingSystemInfo { name version type featureRelease }
       chassis { types }
       agentConnection { status }
       isManaged
@@ -36,7 +36,10 @@ query UpsellFleet {
 
 ```graphql
 query UpsellVulnExposure($customerId: ID!) {
-  vulnerabilityDetectionAggregations(inOrganization: $customerId) {
+  vulnerabilityDetectionAggregations(
+    inOrganization: $customerId
+    where: { status: { in: [UNRESOLVED] } }
+  ) {
     status { buckets(size: 5) { key count } }
     vulnerability {
       severity { buckets(size: 5) { key count } }
@@ -45,7 +48,7 @@ query UpsellVulnExposure($customerId: ID!) {
 }
 ```
 
-Validate before executing.
+Validate before executing. Collect the distinct `customer { id }` values from Step 1's assetSearch nodes and run this query once per customer id, then aggregate the per-customer results into the report.
 
 ## Opportunity detection
 
@@ -54,11 +57,13 @@ Group assets by customer, then check:
 | Opportunity | Signal | Service to pitch |
 |---|---|---|
 | Vulnerability management gap | `vulnerabilityManagement.status` not ACTIVE or null on any device | VM / Security scanning add-on |
-| Patch management gap | `patchManagement.status` = INACTIVE on any device | Managed patching tier upgrade |
+| Patch management gap | `patchManagement.status` not ACTIVE or null on any device | Managed patching tier upgrade |
 | Unmanaged devices | `isManaged = false` devices present | Full managed services expansion |
-| EOL OS exposure | Devices running Windows 10, Server 2012/2016 in extended-only | OS upgrade project / vCIO advisory |
+| EOL OS exposure | Devices on known end-of-life OS (e.g. Windows 10, Server 2012/2016) | OS upgrade project / vCIO advisory |
 | High vuln count | CRITICAL or IMPORTANT unresolved detections >5 | MDR / security stack |
 | No tags = no organization | `tags.nodes` empty on most devices | Structured onboarding / assessment |
+
+For EOL OS exposure, classify each device from `operatingSystemInfo.name`/`version` against known end-of-life OS versions (cross-reference the `eol-os-report` skill) rather than relying on a lifecycle field the query does not return.
 
 ## Output format
 

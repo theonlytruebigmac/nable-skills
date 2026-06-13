@@ -9,16 +9,17 @@ Compute a weighted composite health score (0–100) for a customer using the N-a
 ## Queries
 
 ```graphql
-query HealthScoreAssets($customerId: ID!) {
-  assetSearch(first: 200, inOrganizations: [$customerId]) {
+query HealthScoreAssets($customerId: ID!, $after: String) {
+  assetSearch(first: 200, after: $after, inOrganizations: [$customerId]) {
     totalCount
+    pageInfo { endCursor hasNextPage }
     nodes {
       id
       name
       agentConnection { status statusChangedAt }
       patchManagement { status }
       reboot { isRequired }
-      operatingSystemInfo { name featureRelease }
+      operatingSystemInfo { name version featureRelease }
       isManaged
       tags { nodes { name } }
     }
@@ -45,7 +46,7 @@ query HealthScoreVulns($customerId: ID!) {
 }
 ```
 
-Validate each before executing.
+Validate each before executing. If `totalCount > 200`, paginate the assets query: re-run with `after: <pageInfo.endCursor>` and loop while `pageInfo.hasNextPage` is true, accumulating all `nodes` so the per-device dimensions (connectivity, EOL OS, managed coverage) are computed over the whole fleet rather than the first 200 assets.
 
 ## Scoring model
 
@@ -58,6 +59,8 @@ Score each dimension 0–100, then apply weights:
 | Vulnerability posture | 20% | Start 100, subtract: CRITICAL=15pts, IMPORTANT=8pts, MODERATE=3pts (floor 0) |
 | EOL OS exposure | 15% | (devices on supported OS / total) × 100 |
 | Managed coverage | 15% | (isManaged=true / total) × 100 |
+
+For **EOL OS exposure**, classify each device's `operatingSystemInfo.name`/`version` against known end-of-life versions (e.g. Windows 10, Server 2012/2012 R2, Server 2008, macOS older than 3 major versions; see the `eol-os-report` skill's EOL reference table for the full list). A device counts as "supported OS" if its OS is still vendor-patched.
 
 **Overall = sum of (dimension score × weight)**
 

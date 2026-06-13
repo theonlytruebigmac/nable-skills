@@ -8,7 +8,7 @@ Reconstruct an incident timeline from N-central data using the N-able MCP.
 
 ## Steps
 
-Ask for the customer name and time window if not provided (e.g., "June 9 between 2pm–6pm").
+Ask for the customer name and time window if not provided (e.g., "June 9 between 2pm–6pm"). Capture both endpoints of the window as `$since` (start) and `$until` (end) so queries can be bounded on both sides.
 
 ### 1. Find affected devices and their current state
 
@@ -39,12 +39,12 @@ query IncidentDeviceState($customerId: ID!) {
 For each device of interest, query activity log:
 
 ```graphql
-query AssetActivityLog($assetId: ID!, $since: DateTime!) {
+query AssetActivityLog($assetId: ID!, $since: DateTime!, $until: DateTime!) {
   asset(id: $assetId) {
     name
     activitySearch(
       first: 50
-      where: { occurredAt: { gte: $since } }
+      where: { occurredAt: { gte: $since, lte: $until } }
       orderBy: [{ field: OCCURRED_AT, direction: ASC }]
     ) {
       nodes {
@@ -61,11 +61,11 @@ query AssetActivityLog($assetId: ID!, $since: DateTime!) {
 ### 3. Script task executions during the window
 
 ```graphql
-query IncidentTaskHistory($assetId: ID!, $since: DateTime!) {
+query IncidentTaskHistory($assetId: ID!, $since: DateTime!, $until: DateTime!) {
   asset(id: $assetId) {
     taskExecutionSearch(
       first: 25
-      where: { startedAt: { gte: $since } }
+      where: { startedAt: { gte: $since, lte: $until } }
       orderBy: [{ field: STARTED_AT, direction: ASC }]
     ) {
       nodes {
@@ -84,10 +84,13 @@ query IncidentTaskHistory($assetId: ID!, $since: DateTime!) {
 ### 4. Patch installation failures in the window
 
 ```graphql
-query IncidentPatchFailures($customerId: ID!) {
+query IncidentPatchFailures($customerId: ID!, $since: DateTime!, $until: DateTime!) {
   patchInstallationSearch(
     first: 25
-    where: { installationStatus: { equals: ERROR } }
+    where: {
+      installationStatus: { equals: ERROR }
+      errorDetails: { occurredAt: { gte: $since, lte: $until } }
+    }
     inOrganizations: [$customerId]
   ) {
     nodes {

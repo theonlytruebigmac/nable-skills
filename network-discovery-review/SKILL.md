@@ -78,5 +78,3 @@ Recommended actions per chassis type:
 - **Server** → Escalate immediately — unmanaged servers are a security blind spot
 - **Workstation/laptop** → Schedule agent deployment with user notification
 - **Unknown chassis** → Investigate with customer before deploying
-
-Flag any unmanaged device in a customer with an active SLA — those represent contract scope gaps.

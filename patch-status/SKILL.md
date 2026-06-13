@@ -45,7 +45,7 @@ query PatchErrors($customerId: ID!) {
     first: 100
     where: { installationStatus: { equals: ERROR } }
     inOrganizations: [$customerId]
-    orderBy: [{ field: LAST_UPDATED_AT, direction: DESC }]
+    orderBy: [{ field: FAILURE_COUNT, direction: DESC }]
   ) {
     totalCount
     nodes {
@@ -89,10 +89,11 @@ query UnpatchedCritical($customerId: ID!) {
 ## Step 4 — Devices with inactive patch management
 
 ```graphql
-query PatchMgmtInactive {
+query PatchMgmtInactive($customerId: ID!) {
   assetSearch(
     first: 100
-    where: { patchManagement: { status: { equals: INACTIVE } } }
+    where: { patchManagement: { status: { notEquals: ACTIVE } } }
+    inOrganizations: [$customerId]
   ) {
     nodes {
       id
