@@ -1,0 +1,88 @@
+---
+description: Identify customers showing environment signals that correlate with dissatisfaction or churn risk. Triggers on "renewal risk", "at-risk customers", "churn risk", "which clients need attention", "account health".
+---
+
+# Renewal Risk Report
+
+Surface customers with deteriorating environment signals using the N-able MCP.
+
+## Step 1 — Full fleet snapshot
+
+```graphql
+query RenewalRiskFleet {
+  assetSearch(
+    first: 500
+    orderBy: [{ field: NAME, direction: ASC }]
+  ) {
+    totalCount
+    nodes {
+      id
+      name
+      customer { id name }
+      agentConnection { status statusChangedAt }
+      patchManagement { status }
+      operatingSystemInfo { name }
+      isManaged
+      reboot { isRequired }
+      tags { nodes { name } }
+    }
+  }
+}
+```
+
+## Step 2 — Vulnerability counts per customer
+
+```graphql
+query RenewalRiskVulnsByCustomer($customerId: ID!) {
+  vulnerabilityDetectionAggregations(inOrganization: $customerId) {
+    vulnerability {
+      severity { buckets(size: 5) { key count } }
+    }
+    status { buckets(size: 5) { key count } }
+  }
+}
+```
+
+Run this per customer found in Step 1. Group by `customer.id`.
+
+## Step 3 — Patch error counts per customer
+
+```graphql
+query RenewalRiskPatchErrors($customerId: ID!) {
+  patchInstallationAggregations(inOrganization: $customerId) {
+    status { buckets(size: 7) { key count } }
+  }
+}
+```
+
+Validate before executing.
+
+## Risk signal scoring
+
+For each customer, accumulate risk points:
+
+| Signal | Points |
+|---|---|
+| >25% of devices agent DISCONNECTED | +3 |
+| Any unresolved CRITICAL vulnerability | +2 each (cap at +6) |
+| Patch ERROR count >5 | +2 |
+| Patch management INACTIVE on any device | +1 |
+| 10–25% devices disconnected | +1 |
+| Any device on EOL OS | +1 |
+| Unmanaged devices present | +1 |
+
+**Risk tier:** 6+ = HIGH | 3–5 = MEDIUM | 0–2 = LOW
+
+## Output format
+
+**Renewal Risk Report — [Date]**
+
+Summary: X customers HIGH, X MEDIUM, X LOW.
+
+List HIGH and MEDIUM customers sorted by score:
+- Customer name | Service Org | Risk tier | Score
+- Bullet list of signals that contributed
+- One-paragraph account summary for the account manager
+- Recommended action: Immediate outreach / Schedule check-in / Monitor
+
+LOW customers: summary table only (name, score).
