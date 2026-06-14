@@ -28,7 +28,7 @@ Call `report_org_hierarchy` and pick the matching customer/site row. Skip if the
 ```json
 { "orgUnitId": 388, "all": true, "format": "json" }
 ```
-Call `list_devices_by_org_unit` and keep `deviceId -> longName / deviceClass / customerName / siteName`. You'll join this to the asset rows.
+Call `list_devices_by_org_unit` (`all:true` here because the inventory must cover every device in the org unit) and keep `deviceId -> longName / deviceClass / customerName / siteName`. You'll join this to the asset rows.
 
 ## Step 3 — Bulk asset pull across the org unit
 ```json
@@ -48,7 +48,7 @@ Call `get_device_assets`. Everything is nested under **`data._extra`** as keyed 
 From the installed-software lists across all devices, count installs per application name (normalize obvious version-suffix noise) and rank descending. This surfaces standard apps, license-bearing software, and one-off installs worth flagging.
 
 ## Output format
-**Asset Inventory — [Customer/Org Unit] — 2026-06-13**
+**Asset Inventory — [Customer/Org Unit] — [today YYYY-MM-DD]**
 
 Hardware table, sorted by Customer/Site then Device:
 

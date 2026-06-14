@@ -9,9 +9,10 @@ Save the current state of the N-central fleet to a local timestamped file so fut
 ## Step 1 — Fleet overview
 
 ```graphql
-query SnapshotFleet {
-  assetSearch(first: 500) {
+query SnapshotFleet($after: String) {
+  assetSearch(first: 500, after: $after) {
     totalCount
+    pageInfo { hasNextPage endCursor }
     nodes {
       id
       customer { id name }
@@ -27,7 +28,7 @@ query SnapshotFleet {
 }
 ```
 
-If `totalCount > 500`, paginate using `after` cursor until all assets are collected.
+If `totalCount > 500`, re-run with `after: <pageInfo.endCursor>` while `pageInfo.hasNextPage` is true, accumulating all `nodes` so per-customer summaries and fleet totals cover the whole fleet.
 
 ## Step 2 — Patch aggregations (full fleet)
 

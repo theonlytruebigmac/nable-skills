@@ -26,10 +26,8 @@ query StaleDeviceAudit($after: String) {
       operatingSystemInfo { name type }
       chassis { types }
       agentConnection { status statusChangedAt }
-      lastBootedAt
       tags { nodes { name } }
       isManaged
-      systemInfo { hostname manufacturer model }
     }
   }
 }

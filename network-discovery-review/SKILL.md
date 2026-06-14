@@ -15,6 +15,7 @@ query UnmanagedDevices {
     where: { isManaged: { equals: false } }
   ) {
     totalCount
+    pageInfo { hasNextPage endCursor }
     nodes {
       id
       name
@@ -42,6 +43,7 @@ query RecentlyDisconnected {
     orderBy: [{ field: NAME, direction: ASC }]
   ) {
     totalCount
+    pageInfo { hasNextPage endCursor }
     nodes {
       id
       name
@@ -56,7 +58,7 @@ query RecentlyDisconnected {
 }
 ```
 
-Validate before executing.
+Validate before executing. If `totalCount` exceeds the returned node count, page the rest (re-run with `after: <pageInfo.endCursor>`, re-validating, while `pageInfo.hasNextPage` is true) so the count-by-OS and count-by-customer summaries cover the full fleet.
 
 ## Classification
 

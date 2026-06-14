@@ -15,6 +15,7 @@ query RenewalRiskFleet {
     orderBy: [{ field: NAME, direction: ASC }]
   ) {
     totalCount
+    pageInfo { hasNextPage endCursor }
     nodes {
       id
       name
@@ -29,6 +30,8 @@ query RenewalRiskFleet {
   }
 }
 ```
+
+Validate before executing. If `totalCount > 500`, re-run with `after: <endCursor>` while `hasNextPage` is true, accumulating `nodes` — the percentage signals below must cover the full fleet, not just the first 500.
 
 ## Step 2 — Unresolved CRITICAL vulnerability count per customer
 

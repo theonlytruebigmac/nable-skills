@@ -1,5 +1,5 @@
 ---
-description: Read and write device runbook/handoff notes in N-central, single or bulk, with preview-and-confirm on every write. Triggers on "device notes", "add note to [device]", "runbook note", "note all [client] servers", "read notes for [device]", "annotate devices".
+description: Read and write device runbook/handoff notes in N-central, single or bulk, with preview-and-confirm on every write. Triggers on "device notes", "add note to [device]", "note all [client] servers", "read notes for [device]".
 ---
 
 # N-central Device Notes Manager
@@ -18,7 +18,7 @@ Uses the **N-central MCP** (classic N-central REST API).
 Notes:
 - `deviceId` is a STRING for read/single ops; `deviceIDs` for bulk is an array of NUMBERS.
 - There is no delete-note tool. To retract a note, `update_device_note` it to a tombstone (e.g. "[voided <date>]").
-- Resolve org unit / customer / device IDs first with `report_org_hierarchy` or `list_devices` if the user gives names.
+- Resolve names to IDs first — see [#org-hierarchy--ids](../docs/ncentral-mcp-reference.md#org-hierarchy--ids).
 
 ## Step 1 — Read notes for a device
 ```json
@@ -34,11 +34,11 @@ Preview to display:
 ADD NOTE — preview
 Device:  WEB-PROD-01 (deviceId 123456)
 Author:  <authenticated user>
-Text:    "Rebooted after patch window 2026-06-13; verify IIS app pool on next check."
+Text:    "Rebooted after patch window <date>; verify IIS app pool on next check."
 ```
 Ask: "Add this note? (yes/no)". Only on explicit `yes`, send:
 ```json
-{ "deviceId": "123456", "text": "Rebooted after patch window 2026-06-13; verify IIS app pool on next check." }
+{ "deviceId": "123456", "text": "Rebooted after patch window <date>; verify IIS app pool on next check." }
 ```
 
 ## Step 3 (write) — Update an existing note: preview + confirm
@@ -49,11 +49,11 @@ Preview to display:
 UPDATE NOTE — preview
 Device:  WEB-PROD-01 (deviceId 123456)  noteId "9981"
 Old:     "Temp DNS fix in place."
-New:     "DNS permanently corrected 2026-06-13; temp fix removed."
+New:     "DNS permanently corrected <date>; temp fix removed."
 ```
 On explicit `yes`, send:
 ```json
-{ "deviceId": "123456", "noteId": "9981", "text": "DNS permanently corrected 2026-06-13; temp fix removed." }
+{ "deviceId": "123456", "noteId": "9981", "text": "DNS permanently corrected <date>; temp fix removed." }
 ```
 
 ## Step 4 (write) — Bulk-note all devices for a client: resolve, preview, confirm

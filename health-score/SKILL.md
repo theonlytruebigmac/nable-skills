@@ -16,12 +16,9 @@ query HealthScoreAssets($customerId: ID!, $after: String) {
     nodes {
       id
       name
-      agentConnection { status statusChangedAt }
-      patchManagement { status }
-      reboot { isRequired }
-      operatingSystemInfo { name version featureRelease }
+      agentConnection { status }
+      operatingSystemInfo { name version }
       isManaged
-      tags { nodes { name } }
     }
   }
 }

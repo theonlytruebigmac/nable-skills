@@ -6,11 +6,7 @@ description: Reconcile GraphQL patch state against N-central maintenance windows
 
 Answer "are our unpatched devices actually scheduled to patch?" by joining patch state from GraphQL against maintenance-window and service-health facts from N-central.
 
-Uses **both** the N-able MCP (GraphQL) and the N-central MCP (classic REST).
-
-## ID-space warning (read first)
-
-The two MCPs use **different ID spaces**. A GraphQL asset/organization id is NOT an N-central numeric `deviceId`/`customerId`/`orgUnitId`. **Never pass an id from one MCP to the other.** Correlate only on stable human attributes — customer NAME and device NAME/hostname (OS as tiebreaker). Tag every fact below with its source: **[GraphQL]** or **[N-central]**.
+> **IDs don't cross MCPs** — never pass an id between them; join on customer NAME + device name/hostname (OS as tiebreaker), and flag any single-system match. See [cross-MCP correlation](../docs/ncentral-mcp-reference.md#cross-mcp-correlation).
 
 ## What's available
 
@@ -29,7 +25,7 @@ This skill is **read-only** — no mutations, no confirmation gate required.
 
 ```graphql
 query UnpatchedDevices {
-  patchInstallationSearch(where: {
+  patchInstallationSearch(first: 200, where: {
     or: [
       { installationStatus: { equals: AVAILABLE } }
       { installationStatus: { equals: ERROR } }
@@ -80,7 +76,7 @@ The GraphQL `asset.id` is useless to N-central. Resolve the N-central `deviceId`
 { "tool": "list_devices", "args": { "all": true, "select": "customerId==12345" } }
 ```
 
-Match each unpatched GraphQL asset to an N-central device by exact `name` (then hostname, then OS as tiebreaker) to obtain its numeric `deviceId`. **If a device appears in only one system, do NOT guess a match** — flag it: it may be unmanaged on one side or named differently. Confirm the name match with the operator before merging.
+Match each unpatched GraphQL asset to an N-central device by exact `name` (then hostname, then OS as tiebreaker) to obtain its numeric `deviceId`. Flag any single-system device rather than guessing a match.
 
 ## Step 4 — Check maintenance window + service health [N-central]
 
@@ -99,10 +95,10 @@ A non-empty `data` array with an `enabled` recurring schedule (`cron` + `duratio
 ## Step 5 — (Optional) catalog cross-check [N-central]
 
 ```json
-{ "tool": "generate_patch_comparison_report", "args": { "startDate": "2026-06-01", "installStatuses": ["FAILED", "PENDING"], "patchApprovals": ["NOT_APPROVED"] } }
+{ "tool": "generate_patch_comparison_report", "args": { "startDate": "<first of current month, YYYY-MM-DD>", "installStatuses": ["FAILED", "PENDING"], "patchApprovals": ["NOT_APPROVED"] } }
 ```
 
-Returns a `reportId` (async). Poll with `get_report {reportId}` for the approved-vs-installed catalog view when you need fleet-level confirmation.
+Derive `startDate` from `get_server_time` (first of the current month). Returns a `reportId` (async). Poll with `get_report {reportId}` for the approved-vs-installed catalog view when you need fleet-level confirmation.
 
 ## Step 6 — Diagnose each unpatched device
 
@@ -115,7 +111,9 @@ Apply in order:
 
 ## Output format
 
-**Patch Reconciliation — [Customer or Fleet] — [Date]**
+Tag every fact with its source: **[GraphQL]** or **[N-central]**.
+
+**Patch Reconciliation — [Customer or Fleet] — [today]**
 
 Group rows by diagnosis bucket (a, b, c, d — buckets b/c/d first, a last). Within each bucket sort by failed-then-missing patch count descending.
 

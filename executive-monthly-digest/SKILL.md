@@ -4,7 +4,7 @@ description: Generate a monthly MSP operations digest across all customers for l
 
 # Executive Monthly Digest
 
-Produce a leadership-ready monthly operations summary across all managed customers using the N-able MCP.
+Produce a leadership-ready monthly operations summary across all managed customers via the N-able GraphQL MCP (nable-mcp).
 
 ## Queries
 

@@ -16,7 +16,7 @@ Writes (filling values) are gated behind a preview + explicit confirmation and v
 - `update_device_custom_property` — WRITE; PUT requires `propertyName` + `propertyType`. `propertyType` ∈ HTML_LINK | TEXT | DATE | ENUMERATED | PASSWORD and MUST match the definition.
 - `update_org_custom_property_default` — WRITE; set an org default with `propagationType` controlling inheritance.
 
-Resolve `orgUnitId` with `report_org_hierarchy` if the operator gives a name.
+Resolve a named org to `orgUnitId` via `report_org_hierarchy` (see [org hierarchy & IDs](../docs/ncentral-mcp-reference.md#org-hierarchy--ids)).
 
 ## Step 1 — Discover property definitions
 ```json
@@ -64,7 +64,7 @@ Per device, per property:
 ```json
 { "orgUnitId": 1001, "propertyId": 42, "propertyName": "Backup Vendor", "defaultValue": "Veeam", "propagate": true, "propagationType": "SERVICE_ORGANIZATION_AND_CUSTOMER_AND_SITE" }
 ```
-`update_org_custom_property_default` — `propagationType` MUST be one of: NO_PROPAGATION, SERVICE_ORGANIZATION_ONLY, SERVICE_ORGANIZATION_AND_CUSTOMER, SERVICE_ORGANIZATION_AND_SITE, SERVICE_ORGANIZATION_AND_CUSTOMER_AND_SITE, CUSTOMER_AND_SITE, CUSTOMER_ONLY, SITE_ONLY, ORGANIZATION_ONLY, DEVICE_ONLY (and the DEVICE-inclusive variants). Pick the one matching which levels should inherit. Inspect any per-device failures returned.
+`update_org_custom_property_default` — `propagationType` must match the level that should inherit — see [propagationType values](../docs/ncentral-mcp-reference.md#custom-properties-msp-metadata). Inspect any per-device failures returned.
 
 ## Step 7 — Verify
 Re-run Step 2 (`report_devices_bulk`, `dataType: "custom-properties"`) or `get_device_custom_property` per touched device and confirm each new value persisted. Report any that did not take.

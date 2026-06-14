@@ -9,17 +9,7 @@ Generate a situational briefing before a tech goes on-site using the N-able MCP.
 ## Step 1 — Find customer ID if needed
 
 ```graphql
-query FindCustomer($name: String!) {
-  organizationSearch(
-    first: 5
-    where: { name: { contains: $name } }
-  ) {
-    nodes {
-      id
-      name
-    }
-  }
-}
+query { organizationSearch(first: 5, where: { name: { contains: "<name>" } }) { nodes { id name } } }
 ```
 
 ## Step 2 — Get all devices at the site
@@ -51,7 +41,7 @@ query SiteDispatchBrief($customerId: ID!) {
 
 ## Step 3 — Script task history on key devices
 
-For any server-class devices, check recent script executions using `list_script_tasks_for_asset` with the device's assetId.
+For any server-class devices, using the N-able MCP call `list_script_tasks_for_asset` with the asset `id` from Step 2 (same GraphQL id space).
 
 Validate queries before executing.
 

@@ -1,10 +1,10 @@
 ---
-description: Generate a structured incident report from N-central data. Triggers on "incident summary for [client]", "write up the outage", "incident report", "what happened with [client] on [date]".
+description: Generate a structured incident report (report only, no PSA ticket) from N-able GraphQL data. Triggers on "incident summary for [client]", "write up the outage", "incident report (no ticket)", "what happened with [client] on [date]".
 ---
 
 # Incident Summary
 
-Reconstruct an incident timeline from N-central data using the N-able MCP.
+Reconstruct an incident timeline from the N-able MCP (GraphQL).
 
 ## Steps
 
@@ -115,7 +115,7 @@ Validate all queries before executing.
 
 **Affected Systems** — Table: device name, role, impact, resolution status.
 
-**Root Cause** — Best inference from available data. Note if causation cannot be determined from N-central data alone.
+**Root Cause** — Best inference from available data. Note if causation cannot be determined from the available data alone.
 
 **Impact** — Duration, devices affected.
 

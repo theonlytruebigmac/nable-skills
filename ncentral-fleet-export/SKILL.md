@@ -15,8 +15,8 @@ Generate a spreadsheet-ready CSV of devices at any scope and hand back the file.
 
 Export rules:
 - Always pass `format:"csv"` for spreadsheet output (`list_*` default json; `report_*` default csv).
-- On `list_devices` / `list_devices_by_org_unit`, pass `all:true` for a complete export — it auto-paginates every page (ignores `pageNumber`/`pageSize`). Without it you get one cheaper page; `pageSize` max is 200. `report_devices_by_so` takes only `soId`+`format` (no `all`/`select`/`pageSize`) and already fetches every device.
-- `select` (on `list_*` only) is a FIQL/RSQL **row** filter (e.g. `soId==50`, AND with `;`). It filters rows, NOT columns. Unsupported fields error `Field not found`.
+- On `list_devices` / `list_devices_by_org_unit`, pass `all:true` for a complete export. `report_devices_by_so` takes only `soId`+`format` (no `all`/`select`/`pageSize`) and already fetches every device.
+- Global call conventions (all/format/pageSize/select): docs/ncentral-mcp-reference.md#global-call-conventions.
 
 ## Step 1 — Resolve the scope ID
 

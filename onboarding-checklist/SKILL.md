@@ -54,7 +54,7 @@ query OnboardingAudit($customerId: ID!, $after: String) {
 }
 ```
 
-Validate before executing. If `totalCount` exceeds the returned node count, page through the rest before computing the audit counts: re-run with `after: $endCursor` (re-validating each time) while `pageInfo.hasNextPage` is true, so all `totalCount` assets are covered. The onboarded/gap counts must reflect the full fleet, not just the first 200 devices.
+Validate before executing. The `first: 200` cap covers most customers in one page. If `totalCount` exceeds 200, confirm scope or page through with `after: $endCursor` (re-validating each time) while `pageInfo.hasNextPage` is true so the counts reflect the full fleet.
 
 ## Baseline checks per device
 

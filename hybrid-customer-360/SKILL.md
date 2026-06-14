@@ -6,16 +6,18 @@ description: Build a complete executive account rollup for one customer by mergi
 
 A single executive customer card combining live ops (GraphQL) with business, asset, and ticketing data (N-central). Uses **both** the N-able MCP (GraphQL) and the N-central MCP (classic REST).
 
-**ID-SPACE WARNING:** The two MCPs use DIFFERENT id spaces. A GraphQL organization/asset id is NOT the N-central numeric `customerId`/`deviceId`. NEVER pass an id from one MCP to the other. Correlate only on stable human attributes — customer NAME, device NAME/hostname. Tag every fact in the report with its source MCP.
+> **IDs don't cross MCPs** — never pass an id between them; join on customer NAME + device name/hostname (OS as tiebreaker), and flag any single-system match. See [cross-MCP correlation](../docs/ncentral-mcp-reference.md#cross-mcp-correlation).
+
+Tag every fact in the report with its source MCP.
 
 This skill is read-only. No mutations.
 
 ## Key tools/types
 - GraphQL: `organizationSearch`, `assetSearch`, `patchInstallationAggregations`, `vulnerabilityDetectionAggregations` — via `validate` then `execute`.
-- N-central: `list_customers` / `report_org_hierarchy`, `list_active_issues`, `get_device_lifecycle`, `get_org_unit_limits`, `report_devices_bulk`, `list_custom_psa_tickets` / `get_psa_customer_mapping`.
+- N-central: `list_customers` / `report_org_hierarchy`, `list_active_issues`, `list_devices_by_org_unit`, `get_device_lifecycle`, `get_org_unit_limits`, `report_devices_bulk`, `list_custom_psa_tickets` / `get_psa_customer_mapping`.
 
 ## Step 1 — Resolve IDs in both systems by name
-Resolve the same customer on each side independently. Never reuse one id for the other MCP.
+Resolve the same customer on each side independently.
 
 GraphQL — get the org id. Always `validate` before `execute`; name every operation.
 ```graphql
@@ -85,7 +87,7 @@ Roll up `warrantyExpiryDate` and `expectedReplacementDate`: count devices expire
 `get_psa_customer_mapping` to confirm the PSA link, then `list_custom_psa_tickets` for open Custom-PSA tickets. If no mapping exists, report "PSA not mapped". Source: **N-central**.
 
 ## Output format
-**Customer 360 — [Customer] — 2026-06-13**
+**Customer 360 — [Customer] — [today]**
 GraphQL org id: `[id]` · N-central customerId: `[id]` (name-matched)
 
 | Section | Metric | Source |

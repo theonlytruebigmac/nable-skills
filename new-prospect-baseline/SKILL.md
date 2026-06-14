@@ -4,7 +4,7 @@ description: Assess a prospect or new customer's environment for scoping and pre
 
 # New Prospect Baseline
 
-Analyze a prospect's N-central environment to scope an engagement accurately before contract signing.
+Analyze a prospect's N-central environment to scope an engagement accurately before contract signing using the N-able MCP.
 
 ## Prerequisite
 
@@ -36,6 +36,7 @@ query ProspectBaseline($customerId: ID!) {
     inOrganizations: [$customerId]
   ) {
     totalCount
+    pageInfo { hasNextPage endCursor }
     nodes {
       id
       name
@@ -75,7 +76,7 @@ query ProspectVulnBaseline($customerId: ID!) {
 }
 ```
 
-Validate all queries before executing.
+Validate all queries before executing. If `totalCount > 200`, paginate the fleet query: re-run with `after: <pageInfo.endCursor>` while `pageInfo.hasNextPage` is true, accumulating all nodes before computing the fleet percentages/counts.
 
 ## Output format
 

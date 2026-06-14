@@ -79,7 +79,7 @@ Validate before executing. To run across all customers, omit `$customerId` and r
 
 For each unresolved vulnerability: calculate days since `firstDetectedAt`. Flag as **SLA BREACH** if over threshold for its severity.
 
-For each patch error: calculate days since `errorDetails.occurredAt`. Flag as **OVERDUE** if error has persisted beyond the patch SLA.
+For each patch error: calculate days since `errorDetails.occurredAt`. Flag as **SLA BREACH** if error has persisted beyond the patch SLA.
 
 ## Output format
 
@@ -92,9 +92,9 @@ For each patch error: calculate days since `errorDetails.occurredAt`. Flag as **
 Breach list: CVE | Asset | Customer | Days open | Patchable?
 
 **Patch Error SLA**
-| Severity | Persistent Errors | Days in Error (avg) |
+| Severity | Breaching SLA | Days in Error (avg) |
 |---|---|---|
 
-Error list: Patch | Asset | Customer | Days in error | Last error message
+Breach list: Patch | Asset | Customer | Days in error | Last error message
 
 **Critical flags** — any CISA KEV or exploit-known vulns unresolved past 7 days.

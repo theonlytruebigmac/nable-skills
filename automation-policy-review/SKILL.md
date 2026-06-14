@@ -4,7 +4,7 @@ description: Review script task executions across devices for failures and cover
 
 # Automation Policy Review
 
-Audit script task executions across N-central using the N-able MCP.
+Audit script task executions across N-central-managed devices via the N-able GraphQL MCP.
 
 ## Tools available
 

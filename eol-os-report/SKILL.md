@@ -32,9 +32,11 @@ query EOLOsReport($after: String) {
 }
 ```
 
-Validate before executing. If `totalCount > 500`, paginate: re-run with `after: <pageInfo.endCursor>` and loop while `pageInfo.hasNextPage` is true, accumulating all `nodes` so the totals and percentages cover the whole fleet.
+Validate with `validate` before `execute`. If `totalCount > 500`, paginate: re-run with `after: <pageInfo.endCursor>` and loop while `pageInfo.hasNextPage` is true, accumulating all `nodes` so the totals and percentages cover the whole fleet.
 
-## EOL reference (as of June 2026)
+## EOL reference
+
+Dates are vendor end-of-support milestones; classify each device by comparing to today.
 
 | OS | Status |
 |---|---|
@@ -56,7 +58,7 @@ Parse `operatingSystemInfo.name`, `version` (and `buildNumber`), and `featureRel
 |---|---|
 | **EOL — No Support** | Past all support; no patches available |
 | **EOL — Extended Only** | Past mainstream; security patches via ESU/Extended |
-| **Approaching EOL** | Within 12 months of end of support |
+| **Approaching EOL** | Within 12 months of end of support (relative to today) |
 | **Supported** | Actively patched by vendor |
 
 ## Output format

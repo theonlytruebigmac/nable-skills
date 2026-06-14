@@ -13,7 +13,7 @@ each other a lot. Use this guide to pick the right one (or both).
 | I want… | N-able GraphQL | N-central REST | Skill(s) |
 |---|:---:|:---:|---|
 | Live monitoring **alerts** (service down/warning) | ✗ (no alert type) | ✅ `list_active_issues`, `get_device_status` | `ncentral-active-issues`, `hybrid-alert-triage` |
-| **CVE** vulnerability detections | ✅ | ✗ | `alert-triage`, `patch-status` (GraphQL) |
+| **CVE** vulnerability detections | ✅ | ✗ | `alert-triage` (GraphQL) |
 | Per-patch **install/error** records | ✅ | partial (report) | `patch-status`, `hybrid-patch-reconciliation` |
 | **Patch maintenance windows** | ✗ | ✅ | `ncentral-maintenance-windows` |
 | **Scheduled task / job** status | partial (history) | ✅ | `ncentral-scheduled-tasks` |
@@ -28,7 +28,8 @@ each other a lot. Use this guide to pick the right one (or both).
 | **Tags** | ✅ | ✗ | `tag-devices` (GraphQL) |
 | CPU / memory **metrics** | ✅ | ✗ | `device-health-check` (GraphQL) |
 | **Org hierarchy** export & ID lookup | partial (`organizationSearch`) | ✅ `report_org_hierarchy` | `ncentral-org-hierarchy` |
-| **Org provisioning** (create SO/customer/site/device) | ✗ | ✅ | `ncentral-deployment-kit` |
+| **Device pre-creation** (stage a device record) | ✗ | ✅ `create_device` | `ncentral-deployment-kit` |
+| **Org provisioning** (create SO/customer/site) | ✗ | ✅ | — (REST only; no skill yet) |
 
 ## When to reach for a hybrid skill
 

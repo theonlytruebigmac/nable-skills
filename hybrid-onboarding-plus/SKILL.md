@@ -6,8 +6,7 @@ description: Audit full onboarding completeness for a customer across technical 
 
 Combined onboarding scorecard that supersets the GraphQL `onboarding-checklist` skill with N-central business/config checks. Uses **both** the N-able MCP (GraphQL) and the N-central MCP (classic REST). Do NOT modify `onboarding-checklist`; this is the deeper, cross-system version.
 
-## ID-space warning (read first)
-The two MCPs use **different ID spaces**. A GraphQL organization/asset id is NOT an N-central `customerId`/`orgUnitId`/`deviceId`. NEVER pass an id from one MCP into the other. Correlate only on stable human attributes: customer **name** and device **name/hostname** (OS as tiebreaker). If a device appears on only one side, flag it — it may be unmanaged on one side or named differently. Confirm the name match with the operator before merging.
+> **IDs don't cross MCPs** — never pass an id between them; join on customer NAME + device name/hostname (OS as tiebreaker), and flag any single-system match. See [cross-MCP correlation](../docs/ncentral-mcp-reference.md#cross-mcp-correlation).
 
 ## Step 1 — Resolve IDs in both systems by name
 GraphQL side — find the customer org id. Always `validate` before `execute`; name every operation.
@@ -65,7 +64,7 @@ This skill is read-only by default. If the operator asks you to **fix** a gap (e
 3. After writing, **verify**: re-read with the matching getter (`get_device_custom_property`, `get_maintenance_windows`, `get_device_lifecycle`, `list_device_notes`) and confirm the new value landed. `create_maintenance_windows` returns per-device partial failures — inspect each.
 
 ## Output format
-**Onboarding+ Report — [Customer] — 2026-06-13**
+**Onboarding+ Report — [Customer] — [today]**
 
 Resolved IDs: GraphQL org `<id>` / N-central customer `<customerId>` — confirm name match.
 

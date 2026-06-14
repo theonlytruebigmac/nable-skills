@@ -39,7 +39,7 @@ Call `get_server_info` (omit `level` or pass `"basic"`). Read `version` (build),
 ```json
 {}
 ```
-Call `get_server_time`, then compare the returned server time to the current operator/local time (today: 2026-06-13). Compute the delta in seconds. **Flag drift > 2 minutes** — clock skew breaks task scheduling and token/auth validity.
+Call `get_server_time`, then compare the returned server time to the current operator/local clock. Compute the delta in seconds. **Flag drift > 2 minutes** — clock skew breaks task scheduling and token/auth validity.
 
 ## Step 5 — Confirm authenticated identity
 ```json

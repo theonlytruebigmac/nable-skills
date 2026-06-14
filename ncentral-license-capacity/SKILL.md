@@ -59,7 +59,7 @@ For each org unit with a numeric limit:
 Sort all rows by `%` descending so the tightest org units surface first.
 
 ## Output format
-**License & Capacity Report — [Partner/Customer] — 2026-06-13**
+**License & Capacity Report — [Partner/Customer] — [Date generated]**
 
 Lead with any flagged rows called out in a one-line banner, e.g. `2 over capacity, 3 near capacity`.
 

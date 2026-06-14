@@ -6,14 +6,14 @@ description: Forecast hardware refresh from asset-lifecycle and warranty data, b
 
 Forecast hardware refresh from per-device asset-lifecycle and warranty data, then optionally backfill missing dates. Uses the **N-central MCP** (classic N-central REST API).
 
-**Today is 2026-06-13 — compute every date delta against it.**
+Call `get_server_time` (no args) to get today's date; compute every date delta against it.
 
 ## Key tools
 - `list_devices_by_org_unit` / `report_devices_by_so` — enumerate devices under a customer, site, or service org.
 - `get_device_lifecycle` — per-device warranty/lease/replacement/purchase dates, cost, location, assetTag.
-- `get_device_assets` — hardware inventory (model, serial, age) for enrichment. Probes 404 — skip them.
-- `patch_device_lifecycle` — PATCH partial lifecycle fields (WRITE). Dates ISO-8601 / YYYY-MM-DD.
-- `update_device_lifecycle` — PUT full replace (requires ALL fields); prefer `patch_*` for backfill.
+- `patch_device_lifecycle` — PATCH partial lifecycle fields (WRITE); prefer over `update_device_lifecycle` PUT for backfill.
+
+Full lifecycle/asset tool quirks: [Asset lifecycle / warranty](../docs/ncentral-mcp-reference.md#tool-catalog).
 
 ## Step 1 — Enumerate devices in scope
 Resolve the org unit first via `report_org_hierarchy` if you only have a name. Then pull every device:
@@ -36,8 +36,8 @@ For each device, pull hardware detail to populate the Model column and sanity-ch
 ```
 `get_device_assets` returns model, serial, and BIOS/purchase age. Skip on 404 (probe/agentless). Fall back to `get_device` `longName` if no model.
 
-## Step 4 — Bucket against 2026-06-13
-For each device pick the **soonest** of `warrantyExpiryDate` and `expectedReplacementDate` (use `leaseExpiryDate` if those are absent) as its refresh trigger. Compute days-left = triggerDate − 2026-06-13, then bucket:
+## Step 4 — Bucket against today
+For each device pick the **soonest** of `warrantyExpiryDate` and `expectedReplacementDate` (use `leaseExpiryDate` if those are absent) as its refresh trigger. Compute days-left = triggerDate − today, then bucket:
 
 | Bucket | Condition (days left) |
 |---|---|
@@ -67,10 +67,10 @@ Only after the user replies "yes", issue one PATCH per device:
 { "deviceId": "987654", "warrantyExpiryDate": "2027-03-01" }
 ```
 
-**Verification (after write):** re-call `get_device_lifecycle` for each patched `deviceId` and confirm the new value persisted. Report any device whose value did not change as a failed write.
+After write, re-call `get_device_lifecycle` per patched `deviceId`; report any value that did not change as a failed write.
 
 ## Output format
-**Hardware Refresh Forecast — [Org/Customer] — 2026-06-13**
+**Hardware Refresh Forecast — [Org/Customer] — [today]**
 
 Bucket summary first:
 | Bucket | Devices | Est. cost |

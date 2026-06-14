@@ -9,7 +9,7 @@ Review and manage device patch maintenance windows. Uses the **N-central MCP** (
 Maintenance windows control WHEN a device patches unattended. A device with NO window will not auto-patch in a controlled time slot — flag it. Create/update are WRITE operations: preview, confirm, then verify.
 
 ## What's available
-- `list_devices_by_org_unit` — resolve all devices under a customer/site (`deviceId` is a string here).
+- `list_devices_by_org_unit` — resolve all devices under a customer/site.
 - `get_maintenance_windows {deviceId}` — read existing windows for one device.
 - `create_maintenance_windows {deviceIDs:[number], maintenanceWindows:[obj]}` — WRITE; returns per-device partial-failure statuses, inspect them.
 - `update_maintenance_windows {maintenanceWindows:[{scheduleId,...}]}` — WRITE; edits an existing window by `scheduleId`.
@@ -32,7 +32,7 @@ For each device, read its current windows.
 { "deviceId": "987654" }
 ```
 
-Returns `{ data: [...], totalItems }`. Each window has (verified): `scheduleID` (note the capital **ID**), `name`, `type`, `cron` (the recurrence, e.g. `0 0 0,16 * * ? *`), `duration` (minutes), `enabled`, `applicableAction` (e.g. Patch `detect`/`download`/`install`/`reboot`), `ruleName`, and reboot settings. Build a per-device row: window name, `cron`, `duration`, `enabled`, action. Devices that return NO windows go on the "missing" list — they won't auto-patch in a controlled slot.
+Returns `{ data: [...], totalItems }`. Each window has (verified): `scheduleID`, `name`, `type`, `cron` (the recurrence, e.g. `0 0 0,16 * * ? *`), `duration` (minutes), `enabled`, `applicableAction` (e.g. Patch `detect`/`download`/`install`/`reboot`), `ruleName`, and reboot settings. Build a per-device row: window name, `cron`, `duration`, `enabled`, action. Devices that return NO windows go on the "missing" list — they won't auto-patch in a controlled slot.
 
 > **Casing gotcha:** the GET returns `scheduleID` (capital ID), but `update_maintenance_windows` expects `scheduleId` (lowercase d). Map the value across when editing.
 
@@ -98,7 +98,7 @@ After any create/update, re-read each affected device to confirm the change land
 Diff the result against the intended spec. Report any device where the window is absent or does not match.
 
 ## Output format
-**Maintenance Window Review — [Customer/Org] — 2026-06-13**
+**Maintenance Window Review — [Customer/Org] — [Date]**
 
 | Device | Window Name | Cron | Duration | Action | Enabled |
 |--------|-------------|------|----------|--------|---------|

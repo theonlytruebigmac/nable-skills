@@ -60,7 +60,7 @@ query CustomerHealthCheck($customerId: ID!) {
 }
 ```
 
-Validate before executing.
+Validate before executing. Classification needs only `agentConnection.status`, `reboot.isRequired`, `patchManagement.status`, `isManaged` — drop the systemInfo/logicalDrives/tags fields when only the health summary is wanted.
 
 ## Health classification
 

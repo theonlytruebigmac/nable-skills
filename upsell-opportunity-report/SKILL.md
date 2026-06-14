@@ -15,6 +15,7 @@ query UpsellFleet {
     orderBy: [{ field: NAME, direction: ASC }]
   ) {
     totalCount
+    pageInfo { hasNextPage endCursor }
     nodes {
       id
       name
@@ -31,6 +32,8 @@ query UpsellFleet {
   }
 }
 ```
+
+If `totalCount > 500`, paginate: re-run with `after: <pageInfo.endCursor>` while `pageInfo.hasNextPage` is true, accumulating nodes before running opportunity detection.
 
 ## Step 2 — Vulnerability exposure by customer
 

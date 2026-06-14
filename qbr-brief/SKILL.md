@@ -18,16 +18,12 @@ query QBRFleet($customerId: ID!) {
     nodes {
       id
       name
-      operatingSystemInfo { name version type architecture featureRelease }
+      operatingSystemInfo { name version type }
       chassis { types }
       agentConnection { status statusChangedAt }
       lastBootedAt
-      patchManagement { status lastPatchScanTime }
-      vulnerabilityManagement { status lastUpdatedAt }
       reboot { isRequired }
-      tags { nodes { name } }
       isManaged
-      systemInfo { hostname manufacturer model }
     }
   }
 }

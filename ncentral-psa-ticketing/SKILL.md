@@ -53,12 +53,12 @@ TICKET PREVIEW — create_custom_psa_ticket
   Customer:  Contoso (customerId 101)
   Device:    SVR-DC01 (deviceId 88123)   ← if ticket is for a device
   Subject:   Disk space critical on SVR-DC01
-  Body:      C: at 96%, monitoring alert fired 2026-06-13 08:14
+  Body:      C: at 96%, monitoring alert fired <alert-timestamp>
   Priority:  High
 ```
 Ask explicitly: "Create this Custom PSA ticket? (yes/no)". Only on an affirmative reply, call:
 ```json
-{ "body": { "customerId": 101, "subject": "Disk space critical on SVR-DC01", "description": "C: at 96%, monitoring alert fired 2026-06-13 08:14", "priority": "High" } }
+{ "body": { "customerId": 101, "subject": "Disk space critical on SVR-DC01", "description": "C: at 96%, monitoring alert fired <alert-timestamp>", "priority": "High" } }
 ```
 
 ## Step 6 — Verify the create
@@ -92,7 +92,7 @@ Then verify with `get_psa_customer_mapping { customerId: 101 }` and show the now
 
 Sort by Created descending. End with a one-line count: `N tickets`.
 
-**Ticket detail** — single block: ID, Customer, Subject, Status, Priority, Assignee, Created, Body. Never include the creds used.
+**Ticket detail** — single block: ID, Customer, Subject, Status, Priority, Assignee, Created, Body.
 
 **Mapping coverage** —
 **PSA Mapping Coverage — [Date]**

@@ -6,7 +6,9 @@ description: Merge both MCPs into one complete picture of a single device, corre
 
 One device's complete picture by merging live and historical data from both systems. Uses **both** the N-able MCP (GraphQL) and the N-central MCP (classic REST).
 
-> **ID-space warning:** The two MCPs use DIFFERENT ID spaces. A GraphQL `asset` id is NOT the N-central numeric `deviceId`. NEVER pass an id from one MCP to the other. Correlate ONLY on stable human attributes: device NAME and/or hostname (OS as tiebreaker). Tag every fact in the output with its source MCP.
+> **IDs don't cross MCPs** — never pass an id between them; join on customer NAME + device name/hostname (OS as tiebreaker), and flag any single-system match. See [cross-MCP correlation](../docs/ncentral-mcp-reference.md#cross-mcp-correlation).
+
+Tag every fact in the output with its source MCP.
 
 This skill is read-only — no mutations.
 
@@ -27,9 +29,9 @@ query Find360Asset($name: String!) {
 }
 ```
 
-N-central — list devices and match the same name client-side. `select` is FIQL/RSQL equality (`field==value`), not wildcard/glob, and not all fields are queryable — so pull the page and match `longName`/`uri` in code rather than relying on a wildcard predicate:
+N-central — list devices and match `longName`/`uri` client-side; `select` can't wildcard (see [#global-call-conventions](../docs/ncentral-mcp-reference.md#global-call-conventions)). Scope with `list_devices_by_org_unit` when the customer is known.
 ```json
-{ "tool": "list_devices", "all": true, "format": "json" }
+{ "tool": "list_devices", "format": "json" }  # add "all": true only if the device isn't on the first page
 ```
 
 State the match explicitly, e.g. "GraphQL asset `abc123` ⇄ N-central deviceId `4471` (matched on hostname SERVER01)." If the device appears in only ONE system, FLAG it — it may be unmanaged on one side or named differently — and confirm with the operator before merging.
@@ -62,7 +64,7 @@ query Asset360Patches($name: String!) {
 ```
 Live metrics and recent automation. `get_single_asset_details_and_metrics` takes `id` (the GraphQL assetId, NOT `assetId`) plus a `currentTimestamp` you set to now:
 ```json
-{ "tool": "get_single_asset_details_and_metrics", "id": "<graphql-id>", "currentTimestamp": "2026-06-13T00:00:00Z" }
+{ "tool": "get_single_asset_details_and_metrics", "id": "<graphql-id>", "currentTimestamp": "<now, ISO-8601>" }
 ```
 ```json
 { "tool": "list_script_tasks_for_asset", "assetId": "<graphql-id>", "where": { "task": { "type": { "equals": "TASK_SUBTYPE_RUN_SCRIPT" } } } }

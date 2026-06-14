@@ -59,7 +59,7 @@ Filter rows where the customer/site name matches; return the numeric ID(s). If t
 - `select` (FIQL/RSQL, e.g. `soId==50`) filters rows, not fields; use it to narrow `list_customers` / `list_sites` server-side.
 
 ## Output format
-**Org Hierarchy — [Service Org or "All"] — 2026-06-13**
+**Org Hierarchy — [Service Org or "All"] — [today]**
 
 Indented tree, sorted alphabetically by name within each tier:
 ```

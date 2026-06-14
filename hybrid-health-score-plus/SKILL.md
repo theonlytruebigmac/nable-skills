@@ -8,8 +8,7 @@ Superset of the GraphQL `health-score` skill: keep every GraphQL dimension, then
 
 Uses **both** the N-able MCP (GraphQL) and the N-central MCP (classic REST).
 
-## ID-SPACE WARNING
-The two MCPs use DIFFERENT ID SPACES. A GraphQL organization/asset id is NOT an N-central numeric `customerId`/`orgUnitId`/`deviceId`. NEVER pass an id from one MCP to the other. Correlate by exact customer NAME (and device name/hostname for per-device merges). If a customer or device appears in only one system, flag it — it may be unmanaged on one side or named differently — and have the operator confirm the match before merging.
+> **IDs don't cross MCPs** — never pass an id between them; join on customer NAME + device name/hostname (OS as tiebreaker), and flag any single-system match. See [cross-MCP correlation](../docs/ncentral-mcp-reference.md#cross-mcp-correlation).
 
 ## Dimensions and weights (combined set)
 GraphQL: Agent connectivity (15), Patch compliance (15), Vuln posture (15), EOL OS (10), Managed coverage (10).
@@ -31,7 +30,7 @@ Find the row whose `customerName` equals "Acme"; its `customerId` is also the or
 Pull the asset-level facts. `validate` then `execute`.
 ```graphql
 query HealthAssets($org: ID!) {
-  assetSearch(first: 500, inOrganizations: [$org]) {
+  assetSearch(first: 100, inOrganizations: [$org]) {
     nodes {
       name systemInfo { hostname }
       agentConnection { status }
@@ -67,7 +66,7 @@ Pull warranty/replacement data per device.
 ```json
 { "tool": "get_device_lifecycle", "args": { "deviceId": "12345" } }
 ```
-Raw = % devices in-warranty (warrantyExpiryDate in future) AND not past `expectedReplacementDate` (use today 2026-06-13). Devices missing lifecycle data count as unknown — exclude from the denominator and note coverage. [N-central]
+Fetch the current date at runtime via `get_server_time`. Raw = % devices in-warranty (warrantyExpiryDate in future) AND not past `expectedReplacementDate` (use today's date). Devices missing lifecycle data count as unknown — exclude from the denominator and note coverage. [N-central]
 
 ## Step 5 — Maintenance coverage
 ```json
@@ -97,7 +96,7 @@ Raw = headroom = (limit − device_count) / limit, where limit = the row's `valu
 For each dimension: contribution = raw% × weight (after any redistribution from Step's "no data" rule). Overall = sum of contributions, 0–100. Grade: A ≥90, B 80–89, C 70–79, D 60–69, F <60. Rank dimensions by lost points (weight − contribution) to find drag factors.
 
 ## Output format
-**Health Score+ — [Customer] — 2026-06-13**
+**Health Score+ — [Customer] — [today]**
 
 Overall: **NN / 100 — Grade X**
 

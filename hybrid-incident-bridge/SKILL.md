@@ -6,7 +6,7 @@ description: Reconstruct an incident from N-central live signals and N-able Grap
 
 Reconstruct an outage from BOTH MCPs, correlate by name, write a report, and optionally draft + open a PSA ticket. Uses **both** the N-able MCP (GraphQL) and the N-central MCP (classic REST).
 
-> **ID-SPACE WARNING:** the two MCPs use DIFFERENT id spaces. A GraphQL organization/asset id is NOT an N-central numeric `customerId`/`deviceId`. NEVER pass an id from one MCP to the other. Correlate ONLY on stable human attributes: exact customer NAME, and device NAME/hostname (OS as tiebreaker). If a device appears in only one system, flag it — it may be unmanaged on one side or named differently — and have the operator confirm the match before merging.
+> **IDs don't cross MCPs** — never pass an id between them; join on customer NAME + device name/hostname (OS as tiebreaker), and flag any single-system match. See [cross-MCP correlation](../docs/ncentral-mcp-reference.md#cross-mcp-correlation).
 
 Ask for the **customer name** and the **time window** (start/end, UTC) before doing anything.
 
@@ -26,7 +26,7 @@ N-central side — resolve the numeric customer + devices:
 ```json
 { "tool": "list_devices_by_org_unit", "orgUnitId": 1234, "all": true }
 ```
-`validate` then `execute` the GraphQL query (never `execute` an unvalidated query). Build a name->{graphqlAssetId, ncentralDeviceId} map. Note any unmatched devices for the operator.
+`validate` then `execute` the GraphQL query (never `execute` an unvalidated query). Build a name->{graphqlAssetId, ncentralDeviceId} map, flagging unmatched devices ([cross-MCP correlation](../docs/ncentral-mcp-reference.md#cross-mcp-correlation)).
 
 ## Step 2 — N-central live signals (what alerted, what failed)
 ```json

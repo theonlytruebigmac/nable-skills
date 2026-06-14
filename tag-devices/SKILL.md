@@ -1,5 +1,5 @@
 ---
-description: Assign tags to devices in N-central. Triggers on "tag [devices/customer]", "add tag to [device]", "label these devices", "tag all servers for [client]", "apply tag [name] to [filter]".
+description: Assign tags to managed devices via the N-able MCP (GraphQL). Triggers on "tag [devices/customer]", "add tag to [device]", "label these devices", "tag all servers for [client]", "apply tag [name] to [filter]".
 ---
 
 # Tag Devices
@@ -97,6 +97,8 @@ query VerifyTagging($assetId: ID!) {
 ```
 
 Run this on 2–3 of the tagged assets to confirm the operation succeeded.
+
+Validate every GraphQL query with `validate` before running it with `execute`.
 
 ## Notes
 

@@ -93,11 +93,13 @@ Most `list_*` and `report_*` tools accept:
 | `list_org_custom_properties` | Property **definitions** for an org unit. |
 | `list_device_custom_properties` | All custom props on one device. |
 | `get_device_custom_property` | One device property. |
-| `update_device_custom_property` | ⚠ PUT requires `propertyName` + `propertyType`. `propertyType` ∈ `HTML_LINK\|TEXT\|DATE\|ENUMERATED\|PASSWORD`, must match the definition. |
-| `get_org_custom_property_default` / `get_device_default_custom_property` | Default values. |
+| `update_device_custom_property` | ⚠ PUT requires `propertyName` + `propertyType`. `propertyType` ∈ `HTML_LINK\|TEXT\|DATE\|ENUMERATED\|PASSWORD`, must match the definition. For `ENUMERATED`, also pass the optional `enumeratedValueList`. |
+| `get_org_custom_property_default` / `get_device_default_custom_property` | Default values. `get_device_default_custom_property` (orgUnitId + propertyId) also returns the `ENUMERATED` allowed-value list. |
 | `update_org_unit_custom_property` | Set a property on an SO/customer/site. |
 | `update_org_custom_property_default` | Update a default + `propagationType` to push down the hierarchy. |
 | `report_devices_bulk` | **Fan-out workhorse** — runs a per-device call across an org unit. `dataType` ∈ `custom-properties\|assets\|monitor-status`. |
+
+**`propagationType`** (for `update_org_custom_property_default`) ∈ `NO_PROPAGATION`, `SERVICE_ORGANIZATION_ONLY`, `SERVICE_ORGANIZATION_AND_CUSTOMER`, `SERVICE_ORGANIZATION_AND_SITE`, `SERVICE_ORGANIZATION_AND_CUSTOMER_AND_SITE`, `CUSTOMER_ONLY`, `CUSTOMER_AND_SITE`, `SITE_ONLY`, `ORGANIZATION_ONLY`, `DEVICE_ONLY` — pick the one matching which levels should inherit (list illustrative; an unusual level may need a different value). For an ENUMERATED property, fetch allowed values first via `get_device_default_custom_property` (orgUnitId + propertyId) or `get_device_custom_property`.
 
 ### Maintenance windows (write)
 | Tool | Purpose / notes |
@@ -185,6 +187,8 @@ side or named differently).
 ## Known quirks (quick list)
 
 - `list_active_issues` — customer/site org units only; `deviceClass*` fields null.
+- `get_org_unit_limits` — rows `{limitName, value, maxValue}`: `value` = configured/licensed limit, `maxValue` = the raise-to ceiling; **neither is current usage** (derive usage from device counts). Device rows: `MaxDevicesProfessional`/`MaxDevicesEssential`/`MaxDevicesMobile`.
+- **Bare-array responses** — `list_active_issues` and `report_devices_bulk` (json, any `dataType`) return a **bare JSON array** with no `{data}` wrapper (`[]` when empty); contrast `get_org_unit_limits`/`get_device_status`/`get_maintenance_windows`, which wrap rows in `{data:[…]}`. `list_active_issues` rows also carry an `_extra` object (deviceName/transitionTime/customerTree).
 - `get_scheduled_task_status` `detailed:true` — SYSTEM/CUSTOMER task ids only.
 - `get_device_assets` — probes 404.
 - `get_device` — `lastLoggedInUser`/`stillLoggedIn` can be null.

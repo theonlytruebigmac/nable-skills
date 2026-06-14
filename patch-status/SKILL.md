@@ -11,10 +11,11 @@ Query N-central patch installation data using the N-able MCP GraphQL API.
 - `patchInstallationSearch` — per-asset records; statuses: `AVAILABLE`, `APPROVED`, `COMPLETED`, `OUTDATED`, `ERROR`, `SCHEDULED`, `DECLINED`
 - `patchInstallationAggregations` — aggregate counts by status using `buckets`
 - `AssetPatchManagement` — per-asset: `lastPatchScanTime`, `status` (`ACTIVE`/`INACTIVE`/`PENDING`/`UNSPECIFIED`)
-
-## Severity values: `CRITICAL`, `IMPORTANT`, `MODERATE`, `LOW`, `UNKNOWN`
+- patch severity: `CRITICAL`, `IMPORTANT`, `MODERATE`, `LOW`, `UNKNOWN`
 
 ## Step 1 — Patch compliance summary for a customer
+
+Omit `inOrganization`/`inOrganizations` to run across the whole fleet.
 
 ```graphql
 query PatchStatusSummary($customerId: ID!) {

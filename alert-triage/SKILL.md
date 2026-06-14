@@ -1,5 +1,5 @@
 ---
-description: Triage active issues and disconnected devices across N-central. Triggers on "triage alerts", "what's firing", "active alerts for [client]", "active issues", "morning standup", "what needs attention".
+description: GraphQL-inferred triage of disconnected/vuln/patch-failure signals across N-central. Triggers on "triage alerts", "what's firing", "GraphQL alert triage", "disconnected/vuln/patch-failure triage", "morning standup", "what needs attention".
 ---
 
 # Alert Triage
@@ -12,7 +12,7 @@ The N-able GraphQL API does not have a dedicated "alert" type. Active issues sur
 1. **Disconnected agents** — assets where `agentConnection.status = DISCONNECTED`
 2. **Vulnerability detections** — via `vulnerabilityDetectionSearch` with `status: UNRESOLVED`
 3. **Patch failures** — via `patchInstallationSearch` with `status: ERROR`
-4. **Reboot required** — assets where `reboot.isRequired = true`
+4. **Reboot required** — disconnected agents (from signal #1) where `reboot.isRequired = true`
 
 ## Steps
 
@@ -107,7 +107,7 @@ Validate each query with `validate` before executing with `execute`.
 **Critical Vulnerabilities** (severity HIGH/CRITICAL or hasExploit=true)
 - Device | Customer | CVE | Risk score | Patchable?
 
-**Reboot Required** (from the Step 1 disconnected-agents query)
-- List devices where `reboot.isRequired = true`
+**Reboot Required** (disconnected agents from Step 1 where `reboot.isRequired = true`)
+- Device | Customer | Last booted
 
 End with a one-line count: X disconnected, X patch failures, X critical vulns.

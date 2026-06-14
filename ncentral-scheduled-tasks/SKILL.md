@@ -28,7 +28,7 @@ Scope to a customer (rerun if a name needs resolving first):
 ```
 Only enabled tasks:
 ```json
-{ "all": true, "select": "enabled==true" }
+{ "all": true, "select": "isEnabled==true" }
 ```
 This gives you the task ids to enrich. **Note:** on some tenants the global `list_scheduled_tasks` returns only `{ "_links": {...} }` with no `data` array (no system/customer-level tasks exposed) — when that happens, drive the report per device instead. `list_device_tasks` with a `deviceId` returns `{ data: [ { taskId, taskName, status } ], totalItems }` (status values like `Completed`, `Scheduled (Last Job Completed)`). Enrich any task of interest via Step 2/3, then go to the Output format.
 
@@ -58,7 +58,6 @@ For appliance tasks, use `get_appliance_task`:
 ```
 
 ## Notes
-- Do not call `detailed:true` on a device-level id — it returns nothing useful. Always navigate via `parentId` to the customer/system parent first.
 - Disabled tasks still appear in the inventory; flag them as `Enabled: No` rather than counting them as failures.
 - If `get_scheduled_task` 404s for an id, skip it and note it as unresolved.
 

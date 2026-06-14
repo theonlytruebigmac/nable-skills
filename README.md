@@ -64,11 +64,12 @@ You can run either MCP on its own; the `hybrid-*` skills assume both are connect
 
 **Rule:** never `execute` without passing `validate` first.
 
-Confirmed GraphQL queries: `assetSearch`, `asset(id)`, `patchSearch`,
-`patchInstallationSearch`, `patchInstallationAggregations`, `patchAggregations`,
+Confirmed GraphQL queries (used by current skills): `assetSearch`, `asset(id)`,
+`assetAggregations`, `patchInstallationSearch`, `patchInstallationAggregations`,
 `vulnerabilityDetectionSearch`, `vulnerabilityDetectionAggregations`,
-`vulnerabilityDetectionByCustomerSearch`, `organizationSearch`, `taskSearch`,
-`taskAggregations`, `scriptSearch`, `tagSearch`, `auditRecordSearch`.
+`organizationSearch`, `taskSearch`, `taskAggregations`, `tagSearch`. The `asset(id)`
+node also exposes nested `activitySearch` and `taskExecutionSearch` (used by
+`incident-summary`).
 
 ### N-central MCP (classic REST)
 
@@ -173,6 +174,12 @@ GraphQL `assetSearch` accepts `inOrganizations: [id]` at any level. N-central us
 | `hybrid-incident-bridge` | Incident timeline from both, then draft a PSA ticket | Post-incident |
 | `hybrid-qbr-plus` | `qbr-brief` + hardware refresh + tickets + license | 1 week before QBR |
 | `hybrid-patch-reconciliation` | Unpatched devices × maintenance windows = root cause | Weekly / patch Tuesday |
+
+### Meta / authoring
+
+| Skill | What it does | Cadence |
+|---|---|---|
+| `create-skill` | Token-minimal template, token-cost model, and review checklist for authoring a new skill in this library | On demand |
 
 ---
 

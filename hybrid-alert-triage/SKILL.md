@@ -8,11 +8,7 @@ Start from N-central's live monitoring alerts (the only source of real alert sta
 
 This is the triage the GraphQL-only `alert-triage` skill cannot do: GraphQL has **no alert type**. N-central owns "what is firing"; GraphQL owns "how dangerous the box is."
 
-## ID-SPACE WARNING (read first)
-The two MCPs use **different ID spaces**. A GraphQL organization/asset id is NOT an N-central `orgUnitId`/`customerId`/`deviceId`. **Never pass an id from one MCP to the other.** Correlate ONLY on stable human attributes:
-- **Customer** — match by exact customer NAME.
-- **Device** — match by device NAME and/or `hostname`, OS as tiebreaker.
-If a device appears in only one system, flag it (unmanaged on one side, or named differently) and confirm the match before merging.
+> **IDs don't cross MCPs** — never pass an id between them; join on customer NAME + device name/hostname (OS as tiebreaker), and flag any single-system match. See [cross-MCP correlation](../docs/ncentral-mcp-reference.md#cross-mcp-correlation).
 
 ## What's available
 - N-central: `list_active_issues` (live alerts; customer/site org units only — iterate a SO's customers), `get_device_status` (failing service tasks), `list_customers` / `report_org_hierarchy` (resolve names+ids).
@@ -48,6 +44,7 @@ Match the alerting device by name, then pull unresolved vulnerabilities with exp
 ```graphql
 query AlertCVEs($name: String!) {
   vulnerabilityDetectionSearch(
+    first: 25
     where: { status: { in: [UNRESOLVED] }, asset: { name: { equals: $name } } }
     orderBy: [{ field: RISK_SCORE, direction: DESC }]
   ) {
@@ -66,6 +63,7 @@ For the same device name, find ERROR and AVAILABLE patches — failed remediatio
 ```graphql
 query AlertPatches($name: String!) {
   patchInstallationSearch(
+    first: 25
     where: {
       asset: { name: { equals: $name } }
       or: [
@@ -90,7 +88,7 @@ query AlertPatches($name: String!) {
 Rank each alerting device by a composite of: live service-down (N-central) + open exploitable/ransomware CVE (GraphQL) + failed patches (GraphQL). The top tier is **service-down AND exploitable CVE AND failed patch** on the same box. Sort descending by that composite.
 
 ## Output format
-**True Alert Triage — [Scope] — 2026-06-13**
+**True Alert Triage — [Scope] — [today]**
 
 Sorted by composite risk, highest first:
 

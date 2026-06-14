@@ -1,5 +1,5 @@
 ---
-description: Assemble everything needed to deploy the N-central agent to a customer or site — registration token, installer download link, and optional device pre-creation with activation key. Triggers on "deploy agent", "install agent for [client]", "registration token", "download link", "agent installer", "activation key", "onboard new device".
+description: Assemble everything needed to deploy the N-central agent to a customer or site — registration token, installer download link, and optional device pre-creation with activation key. Triggers on "deploy agent", "install agent for [client]", "registration token", "agent installer", "activation key", "onboard new device".
 ---
 
 # N-central Agent Deployment Kit
@@ -61,7 +61,7 @@ On explicit `yes`, create it:
   "networkAddress": "10.0.4.21",
   "supportedOs": "Windows 11",
   "deviceClass": "Workstation - Windows",
-  "description": "Pre-staged for agent deploy 2026-06-13"
+  "description": "Pre-staged for agent deploy [today's date]"
 } } }
 ```
 Then pull the per-device activation key (needs the new `deviceId`):
@@ -78,7 +78,7 @@ Confirm `longName`, `customerId`, and `networkAddress` match what was submitted.
 
 ## Output format
 
-**Deployment Packet — [Customer] / [Site] — 2026-06-13**
+**Deployment Packet — [Customer] / [Site] — [today]**
 
 Target
 | Field | Value |

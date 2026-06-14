@@ -8,9 +8,7 @@ Build a superset QBR data brief: the standard GraphQL ops view plus N-central bu
 
 Uses **both** the N-able MCP (GraphQL) and the N-central MCP (classic REST).
 
-## ID-space warning
-
-The two MCPs use DIFFERENT ID SPACES. A GraphQL organization/asset id is NOT an N-central numeric `customerId`/`deviceId`. NEVER pass an id from one MCP into the other. Correlate ONLY on stable human attributes: exact customer NAME, and device NAME/hostname (OS as tiebreaker). If a customer or device appears in only one system, FLAG it and ask the operator to confirm the match before merging — it may be unmanaged on one side or named differently.
+> **IDs don't cross MCPs** — never pass an id between them; join on customer NAME + device name/hostname (OS as tiebreaker), and flag any single-system match. See [cross-MCP correlation](../docs/ncentral-mcp-reference.md#cross-mcp-correlation).
 
 ## What's available
 
@@ -32,9 +30,9 @@ query QbrPlusOrg($name: String!) {
 
 N-central side:
 ```json
-{ "all": true }
+{}
 ```
-Call `list_customers` (or `report_org_hierarchy` to also pull contacts/addresses), match the same customer NAME, and capture the numeric `customerId` / `orgUnitId`. State both resolved ids and confirm the name match before proceeding.
+Call `list_customers` (or `report_org_hierarchy` to also pull contacts/addresses; pass `all:true` to auto-paginate if one page is insufficient), match the same customer NAME, and capture the numeric `customerId` / `orgUnitId`. State both resolved ids and confirm the name match before proceeding.
 
 ## Step 2 — Fleet summary [GQL]
 
@@ -74,12 +72,12 @@ Pull devices for the customer (use the N-central `customerId`/`orgUnitId` from S
 ```json
 { "orgUnitId": 4002, "all": true }
 ```
-`list_devices_by_org_unit` to enumerate (`all:true` auto-paginates), then `get_device_lifecycle` per `deviceId`:
+`list_devices_by_org_unit` to enumerate — full enumeration is required here so the per-device lifecycle fan-out covers the whole fleet (`all:true` auto-paginates) — then `get_device_lifecycle` per `deviceId`:
 ```json
 { "deviceId": "98231" }
 ```
-Bucket each device by the earlier of `warrantyExpiryDate` / `expectedReplacementDate` relative to today (2026-06-13):
-- Q1 (now–2026-09-13), Q2 (–2026-12-13), Q3 (–2027-03-13), Q4 (–2027-06-13), Beyond.
+Bucket each device by the earlier of `warrantyExpiryDate` / `expectedReplacementDate` relative to today (fetch via `get_server_time`):
+- Q1 = now→+3mo, Q2 = +3–6mo, Q3 = +6–9mo, Q4 = +9–12mo, Beyond.
 Sum `cost` per bucket for estimated spend. Devices with no lifecycle data go to an "Unknown" bucket — flag them.
 
 ## Step 5 — Support activity [NC]
@@ -106,7 +104,7 @@ Join GQL fleet to NC lifecycle/tickets per the Step 1 name match. List any devic
 
 ## Output format
 
-**QBR+ Brief — [Customer] — 2026-06-13**
+**QBR+ Brief — [Customer] — [today]**
 
 **Fleet Summary [GQL]**
 | Metric | Count |

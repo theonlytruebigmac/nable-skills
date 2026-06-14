@@ -56,15 +56,15 @@ Call `list_job_statuses` and note any FAILED jobs near the alerting devices. Inc
 - One row per affected device; comma-join multiple failing services in the cell.
 
 ## Output format
-**Active Issues Triage Brief — [Scope: Customer / Site / "All SOs"] — 2026-06-13**
+**Active Issues Triage Brief — [Scope: Customer / Site / "All SOs"] — [today]** (get the run date via `get_server_time`)
 
 Group the table by customer (one sub-header per customer), rows sorted worst-first. The Severity/state column is the row's `notificationState` from Step 2 (available for every device); Failing service(s) comes from Step 3 `stateStatus` only on the devices you drilled into.
 
 ### [Customer Name]
 | Device | Customer | Failing service(s) | Severity/state | Since |
 |--------|----------|--------------------|----------------|-------|
-| SRV-DC01 | Acme Corp | DNS Service, Disk C: | FAILED | 2026-06-13 02:14 |
-| WS-FINANCE-7 | Acme Corp | Antivirus Status | WARNING | 2026-06-12 22:40 |
+| SRV-DC01 | Acme Corp | DNS Service, Disk C: | FAILED | 2025-11-02 02:14 |
+| WS-FINANCE-7 | Acme Corp | Antivirus Status | WARNING | 2025-11-01 22:40 |
 
 If a customer has zero active issues, omit it from the table.
 
@@ -72,4 +72,4 @@ Optionally add a short **Failed jobs** note beneath a customer if Step 4 surface
 
 Close with a one-line summary count, e.g.:
 
-> 3 customers affected · 11 active issues · 7 failing services · 2 WARNING — live N-central monitoring state as of 2026-06-13 09:00.
+> 3 customers affected · 11 active issues · 7 failing services · 2 WARNING — live N-central monitoring state as of [today].

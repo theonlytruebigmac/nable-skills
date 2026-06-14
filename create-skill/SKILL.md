@@ -1,117 +1,95 @@
 ---
-name: create-skillcreate-skill
-description: Create new agent skills with proper structure, progressive disclosure, and bundled resources. Use when user wants to create, write, or build a new skill.
+description: Author a token-minimal, convention-correct skill for this N-able/N-central library. Triggers on "create a skill", "new skill", "write a skill", "build a skill", "scaffold a skill", "add a skill for [task]".
 ---
 
-# Writing Skills
+# Create Skill
+
+North star: **the smallest `SKILL.md` that still runs end-to-end.** Tight, not terse — keep the runnable core verbatim; cut or defer everything else.
+
+## Token-cost model — design for the tier
+
+| Tier | Loads | Cost | Rule |
+|---|---|---|---|
+| `description` | always, for **every** skill, every turn | highest per char (summed across the whole library) | shortest that still discriminates |
+| `SKILL.md` body | once, when this skill is picked | moderate | runnable/decision content only; bake in defaults |
+| `docs/` files, scripts | only when read / run (a script runs without loading its code) | ~zero until used | large, conditional, or shared content goes here |
+
+Before adding a line, ask: **is it runnable or decision-bearing, and unique to this skill?** If not, cut it or move it down a tier.
+
+## Inline vs. defer (this is the real token lever)
+
+Linking is not free — it makes the agent read a whole `docs/` file at run time. Pick the cheaper tier:
+
+- **Inline** a *short* block that's needed on almost every run (e.g. the one-line "join across MCPs by name, never id"). A one-liner beats forcing a big-doc read.
+- **Link to `docs/`** when content is large, only sometimes needed, or would be copied verbatim into 3+ skills (rule of three) — then it lives once and loads only when relevant.
+- **Ship a script** for deterministic, repeated-verbatim code (validation, formatting, paging) — call it instead of regenerating identical code (and its output tokens) every run.
+
+Heavy shared reference already lives in `docs/` — link it, don't re-explain:
+
+| Need | Link |
+|---|---|
+| Which MCP for the task | [which-mcp.md](../docs/which-mcp.md) |
+| Cross-MCP / two-ID-space join | [#cross-mcp-correlation](../docs/ncentral-mcp-reference.md#cross-mcp-correlation) |
+| Org tree + `orgUnitId`/`soId`/`customerId` | [#org-hierarchy--ids](../docs/ncentral-mcp-reference.md#org-hierarchy--ids) |
+| Call conventions (`all:true`, `pageSize` max 200) | [#global-call-conventions](../docs/ncentral-mcp-reference.md#global-call-conventions) |
+| Full tool catalog + per-tool quirks | [ncentral-mcp-reference.md](../docs/ncentral-mcp-reference.md) |
+
+> Today most skills inline these blocks. Linking large/shared ones is the biggest available saving — prefer it for new skills, but don't bloat a skill by linking a one-liner.
 
 ## Process
 
-1. **Gather requirements** - ask user about:
-   - What task/domain does the skill cover?
-   - What specific use cases should it handle?
-   - Does it need executable scripts or just instructions?
-   - Any reference materials to include?
+1. **Infer defaults, don't interview.** Defaults: scope = whole fleet, output = table, mode = read-only/preview. Ask at most one question, only when it changes the output — each round-trip reloads context.
+2. **Draft `SKILL.md`** from the template: numbered steps, real GraphQL/tool calls. Pick the backend via [which-mcp.md](../docs/which-mcp.md).
+3. **Run the checklist**, then confirm with the user.
 
-2. **Draft the skill** - create:
-   - SKILL.md with concise instructions
-   - Additional reference files if content exceeds 500 lines
-   - Utility scripts if deterministic operations needed
+## Description (always-resident — spend chars wisely)
 
-3. **Review with user** - present draft and ask:
-   - Does this cover your use cases?
-   - Anything missing or unclear?
-   - Should any section be more/less detailed?
+Short **and** discriminative. Lead with the unique capability + the entity/API the skill owns, then 3–6 exact trigger phrases. Third person, no filler ("Helps with", "This skill"). An under-discriminative description mis-triggers and loads the **wrong** whole body — pure waste.
 
-## Skill Structure
+- Target ~175–340 chars (1024 hard cap); median in this library is ~230.
+- ✅ `Report patch compliance and installation status for a customer or the fleet. Triggers on "patch status", "missing patches", "patch report for [client]".`
+- ❌ `Helps with patches.`
 
-```
-skill-name/
-├── SKILL.md           # Main instructions (required)
-├── REFERENCE.md       # Detailed docs (if needed)
-├── EXAMPLES.md        # Usage examples (if needed)
-└── scripts/           # Utility scripts (if needed)
-    └── helper.js
-```
+## Template
 
-## SKILL.md Template
-
-```md
+````md
 ---
-name: skill-name
-description: Brief description of capability. Use when [specific triggers].
+description: <capability + entity/API it owns>. Triggers on "<phrase>", "<phrase>", "<phrase>".
 ---
 
-# Skill Name
+# <Skill Name>
 
-## Quick start
+<One line: what it queries, via which MCP.>
 
-[Minimal working example]
+## Step 1 — answer with the smallest query
 
-## Workflows
-
-[Step-by-step processes with checklists for complex tasks]
-
-## Advanced features
-
-[Link to separate files: See [REFERENCE.md](REFERENCE.md)]
+```graphql
+query { ... totalCount }   # prefer aggregations/counts when a number answers the question
 ```
 
-## Description Requirements
+REST equivalent — single page unless asked:
+`{ "tool": "list_devices_by_org_unit", "args": { "orgUnitId": 1234 } }`  # add "all": true only on request
 
-The description is **the only thing your agent sees** when deciding which skill to load. It's surfaced in the system prompt alongside all other installed skills. Your agent reads these descriptions and picks the relevant skill based on the user's request.
+## Step 2 — detail (only if needed)
 
-**Goal**: Give your agent just enough info to know:
-
-1. What capability this skill provides
-2. When/why to trigger it (specific keywords, contexts, file types)
-
-**Format**:
-
-- Max 1024 chars
-- Write in third person
-- First sentence: what it does
-- Second sentence: "Use when [specific triggers]"
-
-**Good example**:
-
-```
-Extract text and tables from PDF files, fill forms, merge documents. Use when working with PDF files or when user mentions PDFs, forms, or document extraction.
+```graphql
+query { nodes(first: 100) { ... } }   # cap results; request only the fields you use
 ```
 
-**Bad example**:
+Validate every GraphQL query before execute. Preview + confirm before any write.
 
-```
-Helps with documents.
-```
+## Output format
 
-The bad example gives your agent no way to distinguish this from other document skills.
+<smallest table that answers the question + a one-line summary; widen only if asked.>
+````
 
-## When to Add Scripts
+## Review checklist
 
-Add utility scripts when:
-
-- Operation is deterministic (validation, formatting)
-- Same code would be generated repeatedly
-- Errors need explicit handling
-
-Scripts save tokens and improve reliability vs generated code.
-
-## When to Split Files
-
-Split into separate files when:
-
-- SKILL.md exceeds 100 lines
-- Content has distinct domains (finance vs sales schemas)
-- Advanced features are rarely needed
-
-## Review Checklist
-
-After drafting, verify:
-
-- [ ] Description includes triggers ("Use when...")
-- [ ] SKILL.md under 100 lines
-- [ ] No time-sensitive info
-- [ ] Consistent terminology
-- [ ] Concrete examples included
-- [ ] References one level deep
+- [ ] One `SKILL.md`; folder name is the skill (**no `name:` field**); frontmatter is `description:` only.
+- [ ] Description: capability first, then `Triggers on "..."` with concrete phrases; ~175–340 chars, discriminative.
+- [ ] Large / conditional / 3+-skill-shared content is linked to `docs/`, not copied; short always-needed blocks may inline.
+- [ ] Deterministic repeated code is a script, not regenerated inline.
+- [ ] Numbered, runnable steps; counts/aggregations before node lists when they suffice; `first:` cap or single REST page by default; only fields you use.
+- [ ] Writes preview + confirm; GraphQL validates before execute.
+- [ ] No time-sensitive info; consistent terminology; links resolve and are one level deep.
+- [ ] Leanest body that still runs (library median 99 lines, range 67–136 — shorter is better).

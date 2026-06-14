@@ -66,7 +66,7 @@ Apply these rules across the collected data:
 This skill is read-only. If the review leads to a change (disabling a user, editing a role or access group, e.g. `create_user_role` / `create_access_group`), STOP: present a preview of exactly what will change (target ID, current value -> new value) and ask for explicit confirmation before any write, then re-run the relevant `get_*`/`list_*` call afterward to verify the change landed.
 
 ## Output format
-**N-central Access & RBAC Review — [SO/Customer] — 2026-06-13**
+**N-central Access & RBAC Review — [SO/Customer] — [today]**
 
 Reviewed by: [current user]
 
