@@ -1,7 +1,7 @@
 {
   "name": "ncentral",
   "version": "0.1.0",
-  "description": "N-central MSP skills for Claude Code. Covers both N-central interfaces — the N-able GraphQL preview MCP (nable-mcp) and the classic N-central REST MCP (N-central-mcp) — plus hybrid skills that use both: alert triage, patch status, health scoring, QBR briefs, fleet reporting, PSA ticketing, and more.",
+  "description": "N-central MSP skills for Claude Code: alert triage, patch status, health scoring, QBR briefs, fleet reporting, PSA ticketing, and hybrid workflows. Ships skills only — it works with the N-able GraphQL MCP and the classic N-central REST MCP, which you connect separately (no MCP setup is bundled).",
   "author": {
     "name": "theonlytruebigmac"
   },

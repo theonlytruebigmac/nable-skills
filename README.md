@@ -25,7 +25,7 @@ This repo is a Claude Code plugin marketplace. Install all skills with:
 
 Skills are then available namespaced as `/ncentral:<skill-name>` (e.g. `/ncentral:alert-triage`). Pull updates later with `/plugin marketplace update nable-skills`.
 
-The skills depend on the N-able and/or N-central MCP servers below — configure those before use.
+The skills call the N-able and/or N-central MCP servers — but this plugin ships **skills only**, so you connect an MCP yourself. See [Connecting an MCP](#connecting-an-mcp).
 
 ### Repository layout
 
@@ -41,51 +41,34 @@ nable-skills/                     ← marketplace (catalog)
         └── skills/               ← all 44 N-central skills
 ```
 
-## MCP servers
+## Connecting an MCP
 
-The `ncentral` plugin **bundles its MCP servers** ([`plugins/ncentral/.mcp.json`](plugins/ncentral/.mcp.json)), so installing the plugin declares both `nable-mcp` and `N-central-mcp` automatically. You only supply secrets — set these environment variables before launching Claude Code:
+This plugin ships **skills only** — it does **not** bundle or configure any MCP server. The skills call tools on the N-able / N-central MCPs, so connect at least one of them yourself; the skills then use whatever's available. An unconnected MCP just means the skills that need it can't run — the rest still work (`hybrid-*` skills need both).
 
-| Env var | Used by | Where to get it |
+| MCP | What it is | How to set it up |
 |---|---|---|
-| `NABLE_API_TOKEN` | `nable-mcp` (GraphQL) | `https://n-able.app/api-token-management` |
-| `NCENTRAL_MCP_PACKAGE` | `N-central-mcp` (REST) | npm package name or local path to your N-central MCP server |
-| `NCENTRAL_BASE_URL` | `N-central-mcp` (REST) | `https://<your-ncentral-server>` |
-| `NCENTRAL_API_TOKEN` | `N-central-mcp` (REST) | **N-central → User Administration → your user → API Access** |
+| `nable-mcp` | N-able's official hosted GraphQL MCP (covers N-central + N-sight) | Docs: [developer.n-able.com/gql/docs/mcp](https://developer.n-able.com/gql/docs/mcp). Generate a token at [n-able.app/api-token-management](https://n-able.app/api-token-management). |
+| `N-central-mcp` | Classic N-central REST MCP — deeper REST coverage | [theonlytruebigmac/n-central-mcp](https://github.com/theonlytruebigmac/n-central-mcp); point it at your N-central with a User-API JWT. |
 
-```bash
-export NABLE_API_TOKEN=...
-export NCENTRAL_MCP_PACKAGE=@yourco/n-central-mcp   # or /path/to/server
-export NCENTRAL_BASE_URL=https://your-ncentral-server
-export NCENTRAL_API_TOKEN=...
-claude
-```
+**Where the config goes depends on the surface:**
 
-Run `/mcp` to check connection status. An **unset variable makes only that server fail** — the skills still load, and you can run either MCP on its own (the `hybrid-*` skills assume both). `nable-mcp` is reached directly through `mcp-remote`; if your N-able endpoint speaks streamable HTTP natively you can swap it for a `{"type":"http","url":...,"headers":{...}}` entry.
+- **Claude Desktop → Chat / Cowork**: `~/Library/Application Support/Claude/claude_desktop_config.json` (`mcpServers`).
+- **Claude Code**: `~/.claude/mcp.json`, or a project-level `.mcp.json`.
 
-<details>
-<summary>Prefer manual config instead of the bundled servers?</summary>
-
-Define them yourself in `~/.claude/mcp.json` (and don't *also* rely on the bundle — declaring the same server name in both places is ambiguous):
+Minimal `nable-mcp` example (drop into the `mcpServers` block of either file):
 
 ```json
 {
   "mcpServers": {
     "nable-mcp": {
       "command": "npx",
-      "args": ["mcp-remote@latest", "https://api.n-able.com/mcp-preview", "--header", "Authorization: Bearer YOUR_TOKEN"]
-    },
-    "N-central-mcp": {
-      "command": "npx",
-      "args": ["-y", "<your-n-central-mcp-package-or-path>"],
-      "env": {
-        "NCENTRAL_BASE_URL": "https://<your-ncentral-server>",
-        "NCENTRAL_API_TOKEN": "YOUR_JWT_OR_API_TOKEN"
-      }
+      "args": ["-y", "mcp-remote", "https://api.n-able.com/mcp", "--header", "Authorization: Bearer YOUR_NABLE_TOKEN"]
     }
   }
 }
 ```
-</details>
+
+In Claude Code, run `/mcp` to check connection status.
 
 ---
 

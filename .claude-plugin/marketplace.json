@@ -12,7 +12,7 @@
     {
       "name": "ncentral",
       "source": "./plugins/ncentral",
-      "description": "N-central skills across the N-able GraphQL and classic REST MCPs, plus hybrid workflows: alert triage, patch status, health scoring, QBR briefs, PSA ticketing, and more."
+      "description": "N-central MSP skills — alert triage, patch status, health scoring, QBR briefs, PSA ticketing, and hybrid workflows. Skills only; connect the N-able GraphQL / N-central REST MCP separately."
     }
   ]
 }
