@@ -12,23 +12,23 @@ each other a lot. Use this guide to pick the right one (or both).
 
 | I want… | N-able GraphQL | N-central REST | Skill(s) |
 |---|:---:|:---:|---|
-| Live monitoring **alerts** (service down/warning) | ✗ (no alert type) | ✅ `list_active_issues`, `get_device_status` | `ncentral-active-issues`, `hybrid-alert-triage` |
+| Live monitoring **alerts** (service down/warning) | ✗ (no alert type) | ✅ `list_active_issues`, `get_device_status` | `active-issues`, `hybrid-alert-triage` |
 | **CVE** vulnerability detections | ✅ | ✗ | `alert-triage` (GraphQL) |
 | Per-patch **install/error** records | ✅ | partial (report) | `patch-status`, `hybrid-patch-reconciliation` |
-| **Patch maintenance windows** | ✗ | ✅ | `ncentral-maintenance-windows` |
-| **Scheduled task / job** status | partial (history) | ✅ | `ncentral-scheduled-tasks` |
-| **Custom properties** (MSP metadata) | ✗ | ✅ | `ncentral-custom-property-audit` |
-| **Warranty / asset lifecycle** | ✗ | ✅ | `ncentral-warranty-lifecycle` |
-| Hardware/software **asset inventory** | partial | ✅ `get_device_assets` | `ncentral-asset-inventory` |
-| **PSA / tickets / company mapping** | ✗ | ✅ | `ncentral-psa-ticketing` |
-| **Users / roles / access groups** | ✗ | ✅ | `ncentral-access-review` |
-| **Device notes** | ✗ | ✅ | `ncentral-device-notes` |
-| **Agent deployment** (tokens/installers/keys) | ✗ | ✅ | `ncentral-deployment-kit` |
-| **License / capacity** limits | ✗ | ✅ | `ncentral-license-capacity` |
+| **Patch maintenance windows** | ✗ | ✅ | `maintenance-windows` |
+| **Scheduled task / job** status | partial (history) | ✅ | `scheduled-tasks` |
+| **Custom properties** (MSP metadata) | ✗ | ✅ | `custom-property-audit` |
+| **Warranty / asset lifecycle** | ✗ | ✅ | `warranty-lifecycle` |
+| Hardware/software **asset inventory** | partial | ✅ `get_device_assets` | `asset-inventory` |
+| **PSA / tickets / company mapping** | ✗ | ✅ | `psa-ticketing` |
+| **Users / roles / access groups** | ✗ | ✅ | `access-review` |
+| **Device notes** | ✗ | ✅ | `device-notes` |
+| **Agent deployment** (tokens/installers/keys) | ✗ | ✅ | `deployment-kit` |
+| **License / capacity** limits | ✗ | ✅ | `license-capacity` |
 | **Tags** | ✅ | ✗ | `tag-devices` (GraphQL) |
 | CPU / memory **metrics** | ✅ | ✗ | `device-health-check` (GraphQL) |
-| **Org hierarchy** export & ID lookup | partial (`organizationSearch`) | ✅ `report_org_hierarchy` | `ncentral-org-hierarchy` |
-| **Device pre-creation** (stage a device record) | ✗ | ✅ `create_device` | `ncentral-deployment-kit` |
+| **Org hierarchy** export & ID lookup | partial (`organizationSearch`) | ✅ `report_org_hierarchy` | `org-hierarchy` |
+| **Device pre-creation** (stage a device record) | ✗ | ✅ `create_device` | `deployment-kit` |
 | **Org provisioning** (create SO/customer/site) | ✗ | ✅ | — (REST only; no skill yet) |
 
 ## When to reach for a hybrid skill

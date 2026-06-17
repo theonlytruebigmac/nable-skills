@@ -1,0 +1,18 @@
+{
+  "name": "nable-skills",
+  "owner": {
+    "name": "theonlytruebigmac",
+    "url": "https://github.com/theonlytruebigmac"
+  },
+  "metadata": {
+    "description": "N-able MSP skill catalog for Claude Code — one plugin per product",
+    "version": "0.1.0"
+  },
+  "plugins": [
+    {
+      "name": "ncentral",
+      "source": "./plugins/ncentral",
+      "description": "N-central skills across the N-able GraphQL and classic REST MCPs, plus hybrid workflows: alert triage, patch status, health scoring, QBR briefs, PSA ticketing, and more."
+    }
+  ]
+}

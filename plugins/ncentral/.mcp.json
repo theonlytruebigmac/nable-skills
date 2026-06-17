@@ -1,0 +1,21 @@
+{
+  "mcpServers": {
+    "nable-mcp": {
+      "command": "npx",
+      "args": [
+        "mcp-remote@latest",
+        "https://api.n-able.com/mcp-preview",
+        "--header",
+        "Authorization: Bearer ${NABLE_API_TOKEN}"
+      ]
+    },
+    "N-central-mcp": {
+      "command": "npx",
+      "args": ["-y", "${NCENTRAL_MCP_PACKAGE}"],
+      "env": {
+        "NCENTRAL_BASE_URL": "${NCENTRAL_BASE_URL}",
+        "NCENTRAL_API_TOKEN": "${NCENTRAL_API_TOKEN}"
+      }
+    }
+  }
+}

@@ -14,19 +14,65 @@ custom properties, maintenance windows, warranty/lifecycle, RBAC, and deployment
 
 ---
 
-## MCP config (`~/.claude/mcp.json`)
+## Install
+
+This repo is a Claude Code plugin marketplace. Install all skills with:
+
+```
+/plugin marketplace add theonlytruebigmac/nable-skills
+/plugin install ncentral@nable-skills
+```
+
+Skills are then available namespaced as `/ncentral:<skill-name>` (e.g. `/ncentral:alert-triage`). Pull updates later with `/plugin marketplace update nable-skills`.
+
+The skills depend on the N-able and/or N-central MCP servers below — configure those before use.
+
+### Repository layout
+
+This repo is a **marketplace** (catalog) with **one plugin per N-able product**. Today that's `ncentral`; future products (e.g. N-sight, Cove) become sibling plugins under `plugins/`, each installable on its own.
+
+```
+nable-skills/                     ← marketplace (catalog)
+├── .claude-plugin/marketplace.json
+├── docs/                         ← shared reference
+└── plugins/
+    └── ncentral/                 ← the N-central product plugin
+        ├── .claude-plugin/plugin.json
+        └── skills/               ← all 44 N-central skills
+```
+
+## MCP servers
+
+The `ncentral` plugin **bundles its MCP servers** ([`plugins/ncentral/.mcp.json`](plugins/ncentral/.mcp.json)), so installing the plugin declares both `nable-mcp` and `N-central-mcp` automatically. You only supply secrets — set these environment variables before launching Claude Code:
+
+| Env var | Used by | Where to get it |
+|---|---|---|
+| `NABLE_API_TOKEN` | `nable-mcp` (GraphQL) | `https://n-able.app/api-token-management` |
+| `NCENTRAL_MCP_PACKAGE` | `N-central-mcp` (REST) | npm package name or local path to your N-central MCP server |
+| `NCENTRAL_BASE_URL` | `N-central-mcp` (REST) | `https://<your-ncentral-server>` |
+| `NCENTRAL_API_TOKEN` | `N-central-mcp` (REST) | **N-central → User Administration → your user → API Access** |
+
+```bash
+export NABLE_API_TOKEN=...
+export NCENTRAL_MCP_PACKAGE=@yourco/n-central-mcp   # or /path/to/server
+export NCENTRAL_BASE_URL=https://your-ncentral-server
+export NCENTRAL_API_TOKEN=...
+claude
+```
+
+Run `/mcp` to check connection status. An **unset variable makes only that server fail** — the skills still load, and you can run either MCP on its own (the `hybrid-*` skills assume both). `nable-mcp` is reached directly through `mcp-remote`; if your N-able endpoint speaks streamable HTTP natively you can swap it for a `{"type":"http","url":...,"headers":{...}}` entry.
+
+<details>
+<summary>Prefer manual config instead of the bundled servers?</summary>
+
+Define them yourself in `~/.claude/mcp.json` (and don't *also* rely on the bundle — declaring the same server name in both places is ambiguous):
 
 ```json
 {
   "mcpServers": {
     "nable-mcp": {
       "command": "npx",
-      "args": [
-        "mcp-remote@latest",
-        "https://api.n-able.com/mcp-preview",
-        "--header",
-        "Authorization: Bearer YOUR_TOKEN"
-      ]
+      "args": ["mcp-remote@latest", "https://api.n-able.com/mcp-preview", "--header", "Authorization: Bearer YOUR_TOKEN"]
     },
     "N-central-mcp": {
       "command": "npx",
@@ -39,11 +85,7 @@ custom properties, maintenance windows, warranty/lifecycle, RBAC, and deployment
   }
 }
 ```
-
-- N-able GraphQL token: `https://n-able.app/api-token-management`.
-- N-central API token: **N-central → User Administration → your user → API Access**.
-
-You can run either MCP on its own; the `hybrid-*` skills assume both are connected.
+</details>
 
 ---
 
@@ -133,34 +175,34 @@ GraphQL `assetSearch` accepts `inOrganizations: [id]` at any level. N-central us
 | `sla-compliance-report` | Patch/vuln age vs. SLA thresholds | Monthly |
 | `fleet-growth-report` | Device count and composition by customer | Monthly |
 
-### N-central MCP — classic REST skills (`ncentral-*`)
+### N-central MCP — classic REST skills
 
 #### Monitoring & ops
 | Skill | What it does | Cadence |
 |---|---|---|
-| `ncentral-active-issues` | Live monitoring-alert triage (the real alerts) | Daily / on-call |
-| `ncentral-scheduled-tasks` | Scheduled-task & job-status monitor | Daily / weekly |
-| `ncentral-maintenance-windows` | Review/create/update patch windows (write) | Monthly / onboarding |
+| `active-issues` | Live monitoring-alert triage (the real alerts) | Daily / on-call |
+| `scheduled-tasks` | Scheduled-task & job-status monitor | Daily / weekly |
+| `maintenance-windows` | Review/create/update patch windows (write) | Monthly / onboarding |
 
 #### Asset & lifecycle
 | Skill | What it does | Cadence |
 |---|---|---|
-| `ncentral-warranty-lifecycle` | Warranty + hardware-refresh forecast & budget | Quarterly |
-| `ncentral-custom-property-audit` | MSP metadata completeness + bulk fill (write) | Monthly |
-| `ncentral-device-notes` | Read/add/bulk device runbook notes (write) | On demand |
-| `ncentral-asset-inventory` | Hardware/software asset inventory | Quarterly |
+| `warranty-lifecycle` | Warranty + hardware-refresh forecast & budget | Quarterly |
+| `custom-property-audit` | MSP metadata completeness + bulk fill (write) | Monthly |
+| `device-notes` | Read/add/bulk device runbook notes (write) | On demand |
+| `asset-inventory` | Hardware/software asset inventory | Quarterly |
 
 #### Admin & onboarding
 | Skill | What it does | Cadence |
 |---|---|---|
-| `ncentral-psa-ticketing` | PSA tickets + customer↔company mapping (write) | On demand |
-| `ncentral-deployment-kit` | Tokens/installers/keys to deploy the agent | On onboarding |
-| `ncentral-license-capacity` | License limits vs. usage / headroom | Monthly |
-| `ncentral-access-review` | Users, roles, access groups audit | Quarterly |
-| `ncentral-org-hierarchy` | SO→Customer→Site export + ID lookup | On demand |
-| `ncentral-patch-comparison` | N-central native patch comparison report | Weekly |
-| `ncentral-fleet-export` | Full spreadsheet-ready device export | On demand |
-| `ncentral-server-health` | N-central server version/uptime/clock drift | Weekly |
+| `psa-ticketing` | PSA tickets + customer↔company mapping (write) | On demand |
+| `deployment-kit` | Tokens/installers/keys to deploy the agent | On onboarding |
+| `license-capacity` | License limits vs. usage / headroom | Monthly |
+| `access-review` | Users, roles, access groups audit | Quarterly |
+| `org-hierarchy` | SO→Customer→Site export + ID lookup | On demand |
+| `patch-comparison` | N-central native patch comparison report | Weekly |
+| `fleet-export` | Full spreadsheet-ready device export | On demand |
+| `server-health` | N-central server version/uptime/clock drift | Weekly |
 
 ### Hybrid skills — both MCPs (`hybrid-*`)
 
@@ -186,10 +228,10 @@ GraphQL `assetSearch` accepts `inOrganizations: [id]` at any level. N-central us
 ## Gaps & guidance
 
 - **Live alerts** live in N-central (`list_active_issues`), not GraphQL — use the
-  `ncentral-active-issues` / `hybrid-alert-triage` skills for real alert state.
+  `active-issues` / `hybrid-alert-triage` skills for real alert state.
 - **CVE vulnerabilities, tags, and CPU/memory metrics** live in GraphQL, not REST.
 - **Month-over-month deltas**: both APIs are current-state — use `snapshot` to build trends.
 - **Ticket response times** live in your PSA; N-central can create/read Custom PSA tickets
-  and mappings via `ncentral-psa-ticketing`.
+  and mappings via `psa-ticketing`.
 - Writes (tagging, maintenance windows, custom properties, notes, lifecycle, tickets,
   provisioning) always **preview and confirm** before executing.

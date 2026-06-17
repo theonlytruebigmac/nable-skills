@@ -43,7 +43,7 @@ Service Organization (soId)
 - **`deviceId` is a string** in most read tools; create/bulk tools take numeric
   `deviceIDs` arrays.
 - Need an ID? Run `report_org_hierarchy` (flat SO→Customer→Site with IDs) or the
-  `ncentral-org-hierarchy` skill.
+  `org-hierarchy` skill.
 
 > **These IDs are NOT the same values as the GraphQL API's org/asset IDs.** See
 > [Cross-MCP correlation](#cross-mcp-correlation) before mixing the two.
